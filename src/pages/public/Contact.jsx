@@ -23,22 +23,45 @@ const Contact = () => {
   const [loading, setLoading] = useState(false);
   const [statusMessage, setStatusMessage] = useState({ type: '', text: '' });
 
-  const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+  // URL sonundaki ekstra eğik çizgileri (slash) temizle
+  const rawApiUrl = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+  const API_URL = rawApiUrl.replace(/\/$/, '');
 
   // Veritabanındaki İletişim Bilgilerini Getir
   useEffect(() => {
     const fetchSettings = async () => {
       try {
         const res = await axios.get(`${API_URL}/api/contact/settings`);
-        if (res.data) {
-          setSettings(res.data);
+        
+        // Yanıt dizi ([{}]) veya obje ({}) gelse de doğru veriyi al
+        const data = Array.isArray(res.data) ? res.data[0] : res.data;
+        
+        if (data && typeof data === 'object') {
+          setSettings((prev) => ({
+            ...prev,
+            ...data
+          }));
         }
       } catch (error) {
         console.error('İletişim bilgileri alınamadı:', error);
+        setSettings((prev) => ({
+          ...prev,
+          address: 'Adres bilgisi yüklenemedi.',
+          phone: '-',
+          email: '-',
+          working_hours: '-'
+        }));
       }
     };
     fetchSettings();
-  }, []);
+  }, [API_URL]);
+
+  // Veritabanına tam <iframe> kodu yapıştırılmışsa içinden sadece src URL'ini ayıkla
+  const getMapSrc = (url) => {
+    if (!url) return '';
+    const match = url.match(/src=["']([^"']+)["']/);
+    return match ? match[1] : url;
+  };
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -79,15 +102,13 @@ const Contact = () => {
 
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: '40px', marginBottom: '50px' }}>
         
-        {/* SOL KOLON: İletişim Bilgileri (Dinamik Başlık ve Açıklama) */}
+        {/* SOL KOLON: İletişim Bilgileri */}
         <div style={{ backgroundColor: '#f9f9f9', padding: '30px', borderRadius: '8px', border: '1px solid #eee' }}>
           
-          {/* Dinamik Başlık */}
           <h3 style={{ fontSize: '20px', fontWeight: '600', marginBottom: '20px', color: '#1a1a1a', borderBottom: '2px solid #2b4c7e', paddingBottom: '10px' }}>
             {settings.info_title || 'Bizimle İletişime Geçin'}
           </h3>
           
-          {/* Dinamik Açıklama Metni */}
           <p style={{ color: '#666', lineHeight: '1.6', marginBottom: '25px', whiteSpace: 'pre-line' }}>
             {settings.info_description}
           </p>
@@ -275,7 +296,7 @@ const Contact = () => {
         <div style={{ borderRadius: '8px', overflow: 'hidden', border: '1px solid #eee' }}>
           <iframe
             title="Google Map"
-            src={settings.map_url}
+            src={getMapSrc(settings.map_url)}
             width="100%"
             height="380"
             style={{ border: 0 }}
