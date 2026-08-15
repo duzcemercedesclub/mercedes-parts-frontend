@@ -1,0 +1,55 @@
+.brand-section { 
+    padding: 80px 40px; 
+    background-color: #f9f9f9; 
+    text-align: center; 
+}
+
+.brand-slider { 
+    width: 100%; 
+    overflow: hidden; 
+    margin-top: 40px; 
+}
+
+.brand-track { 
+    display: flex; 
+    gap: 60px; /* Logolar arası boşluk */
+    width: max-content; /* KRİTİK: Logoların ekrana sıkışmasını engeller, yan yana uzamasını sağlar */
+    animation: scroll 25s linear infinite; 
+}
+
+.brand-item { 
+    width: 160px; 
+    height: 80px; 
+    display: flex; 
+    align-items: center; 
+    justify-content: center; 
+    flex-shrink: 0; /* KRİTİK: Logoların büzüşüp üst üste binmesini kesinlikle engeller */
+    filter: grayscale(100%); 
+    opacity: 0.6; 
+    transition: all 0.3s ease; 
+}
+
+/* Görselin taşmasını engellemek için iç kural */
+.brand-item img {
+    max-width: 100%;
+    max-height: 100%;
+    object-fit: contain; /* Logonun en-boy oranını bozmadan kutuya sığdırır */
+    pointer-events: none;
+}
+
+.brand-item:hover { 
+    filter: grayscale(0%); 
+    opacity: 1; 
+}
+
+@keyframes scroll { 
+    0% { transform: translateX(0); } 
+    100% { transform: translateX(-50%); } 
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .brand-section { padding: 40px 20px; }
+    .brand-track { gap: 40px; }
+    .brand-item { width: 120px; height: 60px; }
+}

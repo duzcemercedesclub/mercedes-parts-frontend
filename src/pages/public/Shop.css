@@ -1,0 +1,255 @@
+.shop-page {
+    padding: 40px 20px;
+}
+
+.shop-breadcrumb {
+    margin-bottom: 40px;
+    border-bottom: 1px solid #eaeaea;
+    padding-bottom: 20px;
+}
+
+.shop-breadcrumb h2 {
+    font-size: 28px;
+    font-weight: 600;
+    color: #1a1a1a;
+    margin-bottom: 5px;
+}
+
+.shop-breadcrumb p {
+    font-size: 14px;
+    color: #888;
+}
+
+/* Layout Dağılımı */
+.shop-layout {
+    display: flex;
+    gap: 40px;
+}
+
+/* Sol Sidebar Filtreleri */
+.shop-sidebar {
+    width: 280px;
+    flex-shrink: 0;
+}
+
+.filter-widget {
+    background-color: #ffffff;
+    border: 1px solid #eaeaea;
+    padding: 25px;
+    margin-bottom: 25px;
+    border-radius: 4px;
+}
+
+.filter-widget h4 {
+    font-size: 16px;
+    font-weight: 600;
+    color: #1a1a1a;
+    margin-bottom: 20px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    display: flex;
+    justify-content: space-between;
+}
+
+.filter-widget .price-val {
+    color: #2b4c7e;
+    font-weight: 700;
+}
+
+.filter-widget ul {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.filter-widget ul li {
+    font-size: 14px;
+    color: #555;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    padding: 4px 0;
+}
+
+.filter-widget ul li:hover {
+    color: #2b4c7e;
+    padding-left: 5px;
+}
+
+.filter-widget ul li.active {
+    color: #2b4c7e;
+    font-weight: 600;
+}
+
+/* Fiyat Slider Bar */
+.price-slider {
+    width: 100%;
+    accent-color: #2b4c7e;
+    cursor: pointer;
+}
+
+/* Sağ İçerik Alanı */
+.shop-content {
+    flex-grow: 1;
+}
+
+/* Üst Araç Çubuğu (Toolbar) */
+.shop-toolbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background-color: #f9f9f9;
+    padding: 15px 25px;
+    border: 1px solid #eaeaea;
+    border-radius: 4px;
+    margin-bottom: 30px;
+}
+
+.product-count {
+    font-size: 14px;
+    color: #555;
+}
+
+.sort-wrapper {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.sort-wrapper label {
+    font-size: 14px;
+    color: #333;
+    font-weight: 500;
+}
+
+.sort-wrapper select {
+    padding: 8px 15px;
+    border: 1px solid #eaeaea;
+    background-color: #fff;
+    font-family: inherit;
+    font-size: 14px;
+    color: #444;
+    outline: none;
+    cursor: pointer;
+}
+
+/* Ürün Izgarası */
+.shop-products-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 25px;
+}
+
+/* Ürün Yoksa Gösterilecek Boş Durum Tasarımı */
+.no-products {
+    text-align: center;
+    padding: 60px 20px;
+    background-color: #fdfdfd;
+    border: 1px dashed #ccc;
+    color: #777;
+}
+
+.no-products i {
+    font-size: 48px;
+    color: #bbb;
+    margin-bottom: 15px;
+}
+
+/* RESPONSIVE AYARLARI */
+@media (max-width: 1200px) {
+    .shop-products-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media (max-width: 992px) {
+    .shop-layout {
+        flex-direction: column;
+    }
+    .shop-sidebar {
+        width: 100%;
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 20px;
+    }
+    .filter-widget {
+        margin-bottom: 0;
+    }
+}
+
+@media (max-width: 768px) {
+    .shop-sidebar {
+        grid-template-columns: 1fr;
+        gap: 15px;
+    }
+    .shop-products-grid {
+        grid-template-columns: 1fr;
+    }
+    .shop-toolbar {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 15px;
+    }
+}
+/* Şase Numarası (VIN) Widget Stilleri */
+.vin-widget {
+    background: linear-gradient(to bottom, #ffffff, #fcfcfc);
+    border-left: 3px solid #2b4c7e;
+}
+
+.vin-input-group {
+    display: flex;
+    gap: 5px;
+    margin-top: 5px;
+}
+
+.vin-input {
+    width: 100%;
+    padding: 8px 10px;
+    border: 1px solid #eaeaea;
+    border-radius: 4px;
+    font-size: 13px;
+    text-transform: uppercase;
+    outline: none;
+    transition: border-color 0.2s;
+}
+
+.vin-input:focus {
+    border-color: #2b4c7e;
+}
+
+.vin-submit-btn {
+    background-color: #2b4c7e;
+    color: #fff;
+    border: none;
+    padding: 0 12px;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+.vin-submit-btn:hover {
+    background-color: #1f375e;
+}
+
+.active-vin-badge {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background-color: #eef2f7;
+    border: 1px solid #d2dce8;
+    padding: 6px 10px;
+    border-radius: 4px;
+    margin-top: 10px;
+    font-size: 12px;
+    color: #2b4c7e;
+}
+
+.clear-vin-btn {
+    background: none;
+    border: none;
+    color: #cc0000;
+    font-size: 16px;
+    font-weight: bold;
+    cursor: pointer;
+    line-height: 1;
+}

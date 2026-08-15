@@ -1,0 +1,330 @@
+/* ==========================================================================
+   AUTH (GİRİŞ & KAYIT) BİRLEŞTİRİLMİŞ STİL DOSYASI (Auth.css)
+   ========================================================================== */
+
+/* 1. Kapsayıcı ve Kart Düzeni */
+.auth-container,
+.auth-page-wrapper {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 75vh;
+    padding: 40px 15px;
+    background-color: #ffffff;
+}
+
+.auth-card,
+.auth-card-box {
+    background: #ffffff;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    padding: 35px 30px;
+    width: 100%;
+    max-width: 450px;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+    box-sizing: border-box;
+}
+
+.auth-card h2,
+.auth-card-box h2 {
+    font-size: 26px;
+    color: #1a202c;
+    margin-bottom: 6px;
+    font-weight: 600;
+}
+
+.auth-card p,
+.auth-card-box p {
+    font-size: 14px;
+    color: #718096;
+    margin-bottom: 22px;
+}
+
+/* 2. Form ve Grid Yapıları */
+.auth-form,
+.n11-auth-form {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+}
+
+.form-row-grid {
+    display: flex;
+    gap: 12px;
+}
+
+.form-row-grid .floating-input-group,
+.form-row-grid .auth-group {
+    flex: 1;
+}
+
+.phone-grid .country-code-group {
+    flex: 0 0 115px;
+}
+
+/* 3. Input ve Etiket Alanları */
+.auth-group,
+.floating-input-group {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    width: 100%;
+}
+
+.auth-group label {
+    font-size: 13px;
+    font-weight: 500;
+    color: #4a5568;
+}
+
+.auth-group input,
+.floating-input-group input {
+    width: 100%;
+    height: 50px;
+    padding: 0 14px;
+    border: 1px solid #cbd5e0;
+    border-radius: 8px;
+    font-size: 14px;
+    outline: none;
+    color: #2d3748;
+    background: #ffffff;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+    box-sizing: border-box;
+}
+
+.auth-group input:focus,
+.floating-input-group input:focus {
+    border-color: #2b4c7e;
+    box-shadow: 0 0 0 1px #2b4c7e;
+}
+
+.floating-input-group.has-value-label input {
+    padding-top: 14px;
+    font-weight: 500;
+}
+
+.mini-label {
+    position: absolute;
+    top: 6px;
+    left: 14px;
+    font-size: 11px;
+    color: #64748b;
+    pointer-events: none;
+    z-index: 1;
+}
+
+/* 4. Şifre Alanı ve Göster/Gizle Butonu */
+.password-group {
+    position: relative;
+}
+
+.eye-toggle-btn {
+    position: absolute;
+    right: 14px;
+    top: 50%;
+    transform: translateY(-50%);
+    background: none;
+    border: none;
+    color: #64748b;
+    font-size: 18px;
+    cursor: pointer;
+    padding: 4px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.eye-toggle-btn:hover {
+    color: #1a202c;
+}
+
+/* 5. Şifre Kuralları Listesi */
+.password-rules-box {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    margin-top: -2px;
+    margin-bottom: 4px;
+}
+
+.rule-item {
+    font-size: 12px;
+    color: #718096;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.rule-item .dot {
+    font-size: 14px;
+    line-height: 1;
+}
+
+.rule-item.valid {
+    color: #16a34a;
+    font-weight: 500;
+}
+
+/* 6. Cinsiyet Seçim Alanı */
+.gender-section {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin-top: 4px;
+}
+
+.section-subtitle {
+    font-size: 13px;
+    color: #4a5568;
+    font-weight: 500;
+}
+
+.gender-btn-group {
+    display: flex;
+    gap: 12px;
+}
+
+.gender-btn {
+    flex: 1;
+    height: 46px;
+    border: 1px solid #cbd5e0;
+    border-radius: 8px;
+    background: #ffffff;
+    color: #2d3748;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.gender-btn:hover {
+    border-color: #94a3b8;
+}
+
+.gender-btn.active {
+    border-color: #1e1e1e;
+    background-color: #f8fafc;
+    font-weight: 600;
+    color: #0f172a;
+}
+
+/* 7. Onay Kutuları ve Metin Bağlantıları */
+.checkbox-section {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin-top: 4px;
+}
+
+.n11-checkbox-label {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    font-size: 13px;
+    color: #334155;
+    cursor: pointer;
+    line-height: 1.4;
+}
+
+.n11-checkbox-label input[type="checkbox"] {
+    width: 18px;
+    height: 18px;
+    margin-top: 2px;
+    accent-color: #1e1e1e;
+    cursor: pointer;
+}
+
+.underlined-link {
+    color: #0f172a;
+    text-decoration: underline;
+    text-underline-offset: 2px;
+}
+
+.privacy-info-text {
+    font-size: 12px;
+    color: #64748b;
+    line-height: 1.4;
+    margin-top: 2px;
+}
+
+/* 8. Şifremi Unuttum Bağlantısı */
+.forgot-password-wrapper {
+    display: flex;
+    justify-content: flex-end;
+    margin-top: -4px;
+}
+
+.forgot-password-link {
+    color: #e6007e;
+    font-size: 14px;
+    font-weight: 600;
+    text-decoration: none;
+}
+
+.forgot-password-link:hover {
+    text-decoration: underline;
+}
+
+/* 9. Gönder Butonu */
+.btn-auth-submit,
+.n11-submit-btn {
+    width: 100%;
+    height: 50px;
+    background-color: #1e1e1e;
+    color: #ffffff;
+    border: none;
+    border-radius: 8px;
+    font-size: 15px;
+    font-weight: 700;
+    cursor: pointer;
+    margin-top: 8px;
+    transition: background-color 0.2s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.btn-auth-submit:hover,
+.n11-submit-btn:hover {
+    background-color: #000000;
+}
+
+.btn-auth-submit:disabled,
+.n11-submit-btn:disabled {
+    background-color: #94a3b8;
+    cursor: not-allowed;
+}
+
+/* 10. Hata Mesajı Kutusı */
+.auth-error-msg {
+    background-color: #fff5f5;
+    color: #e53e3e;
+    padding: 12px 14px;
+    border-radius: 8px;
+    font-size: 13px;
+    font-weight: 500;
+    margin-bottom: 16px;
+    border: 1px solid #fed7d7;
+}
+
+/* 11. Alt Yönlendirme Metinleri */
+.auth-footer-text,
+.auth-switch-link {
+    margin-top: 20px;
+    text-align: center;
+    font-size: 14px;
+    color: #4a5568;
+}
+
+.auth-footer-text a,
+.auth-switch-link a {
+    color: #2b4c7e;
+    font-weight: 600;
+    text-decoration: underline;
+}
+
+.auth-footer-text a:hover,
+.auth-switch-link a:hover {
+    color: #1d3557;
+}

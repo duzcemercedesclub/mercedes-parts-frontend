@@ -1,0 +1,29 @@
+@import url('https://fonts.googleapis.com/css2?family=Jost:wght@400;500;600;700&display=swap');
+
+* { 
+    margin: 0; 
+    padding: 0; 
+    box-sizing: border-box; 
+}
+
+body { 
+    font-family: 'Jost', sans-serif; 
+    background-color: #ffffff; 
+}
+
+a { 
+    text-decoration: none; 
+    color: inherit; 
+}
+
+ul { 
+    list-style: none; 
+}
+
+.container { 
+    max-width: 1400px; 
+    margin: 0 auto; 
+}
+
+/* Genel başlık ve butonlar buraya eklenebilir */
+.section-heading { font-size: 32px; font-weight: 500; color: #222; }

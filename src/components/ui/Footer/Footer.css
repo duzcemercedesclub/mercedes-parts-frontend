@@ -1,0 +1,314 @@
+/* GENEL FOOTER YAPISI */
+.footer-section { 
+    background-color: #fcfcfc; 
+    padding: 80px 0 40px; 
+    border-top: 1px solid #eee; 
+}
+
+.footer-grid { 
+    display: grid; 
+    grid-template-columns: repeat(4, 1fr); 
+    gap: 30px; 
+    margin-bottom: 60px; 
+}
+
+.footer-col h4 { 
+    font-size: 18px; 
+    margin-bottom: 25px; 
+    color: #1a1a1a; 
+    font-weight: 600;
+}
+
+.footer-col ul { 
+    list-style: none; 
+    padding: 0; 
+}
+
+.footer-col ul li { 
+    margin-bottom: 12px; 
+    font-size: 14px; 
+}
+
+.footer-col ul li a {
+    color: #666;
+    text-decoration: none;
+    transition: color 0.3s ease;
+}
+
+.footer-col ul li a:hover { 
+    color: #2b4c7e; 
+}
+
+/* HESABIM VE DİNAMİK KURUMSAL SAYFA BUTONLARI */
+.account-link {
+    font-weight: 600;
+    color: #2b4c7e !important;
+}
+
+.footer-page-btn {
+    background: none;
+    border: none;
+    padding: 0;
+    color: #666;
+    font-size: 14px;
+    cursor: pointer;
+    text-align: left;
+    transition: color 0.3s ease;
+    font-family: inherit;
+}
+
+.footer-page-btn:hover {
+    color: #2b4c7e;
+    text-decoration: underline;
+}
+
+/* HAKKIMIZDA METNİ VE DEVAMINI OKU BUTONU */
+.footer-col p { 
+    color: #666; 
+    font-size: 14px; 
+    line-height: 1.6; 
+    margin: 0;
+}
+
+.about-text-container {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+}
+
+.read-more-btn {
+    background: none;
+    border: none;
+    padding: 0;
+    color: #2b4c7e;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.read-more-btn:hover {
+    color: #1d3557;
+    text-decoration: underline;
+}
+
+.contacts ul li i { 
+    margin-right: 10px; 
+    color: #2b4c7e; 
+}
+
+/* FOOTER ALT ALAN VE ÖDEME ROZETLERİ */
+.footer-bottom { 
+    border-top: 1px solid #eee; 
+    padding-top: 30px; 
+    color: #999; 
+    font-size: 13px; 
+}
+
+.footer-bottom-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 20px;
+}
+
+.copyright-text p {
+    margin: 0;
+    color: #888;
+}
+
+.footer-payments-wrapper {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    flex-wrap: wrap;
+}
+
+/* SSL GÜVENLİK ROZETİ */
+.security-badge {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    background-color: #f0fdf4;
+    border: 1px solid #bbf7d0;
+    color: #166534;
+    padding: 6px 12px;
+    border-radius: 6px;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+    user-select: none;
+    transition: all 0.3s ease;
+}
+
+.security-badge:hover {
+    background-color: #dcfce7;
+    border-color: #86efac;
+    transform: translateY(-1px);
+}
+
+.security-icon {
+    color: #15803d;
+}
+
+/* KREDİ KARTI LOGOLARI */
+.payment-logos {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.payment-badge {
+    width: 48px;
+    height: 30px;
+    box-sizing: border-box;
+    padding: 2px;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #ffffff;
+    border: 1px solid #e5e7eb;
+    border-radius: 4px;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+    transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+    cursor: pointer;
+    filter: grayscale(100%) opacity(0.65);
+    overflow: hidden;
+}
+
+.payment-badge svg {
+    width: 100%;
+    height: 100%;
+    display: block;
+    object-fit: contain;
+}
+
+.payment-badge:hover {
+    filter: grayscale(0%) opacity(1);
+    transform: translateY(-4px) scale(1.06);
+    border-color: #2b4c7e;
+    box-shadow: 0 6px 15px rgba(43, 76, 126, 0.18);
+}
+
+/* YAN PANEL (SIDE DRAWER) STİLLERİ */
+.side-drawer-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background-color: rgba(0, 0, 0, 0.5);
+    z-index: 9999;
+    opacity: 0;
+    visibility: hidden;
+    transition: all 0.3s ease-in-out;
+}
+
+.side-drawer-overlay.open {
+    opacity: 1;
+    visibility: visible;
+}
+
+.side-drawer {
+    position: fixed;
+    top: 0;
+    right: 0;
+    width: 500px;
+    max-width: 90vw;
+    height: 100vh;
+    background-color: #ffffff;
+    z-index: 10000;
+    box-shadow: -5px 0 25px rgba(0, 0, 0, 0.15);
+    transform: translateX(100%);
+    transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    display: flex;
+    flex-direction: column;
+}
+
+.side-drawer.open {
+    transform: translateX(0);
+}
+
+.drawer-header {
+    padding: 20px 24px;
+    border-bottom: 1px solid #eee;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background-color: #f9fafb;
+}
+
+.drawer-header h3 {
+    margin: 0;
+    font-size: 18px;
+    color: #111827;
+    font-weight: 600;
+}
+
+.drawer-close-btn {
+    background: none;
+    border: none;
+    font-size: 28px;
+    line-height: 1;
+    color: #6b7280;
+    cursor: pointer;
+    transition: color 0.2s ease;
+}
+
+.drawer-close-btn:hover {
+    color: #ef4444;
+}
+
+.drawer-body {
+    padding: 24px;
+    overflow-y: auto;
+    flex: 1;
+    color: #374151;
+    font-size: 15px;
+    line-height: 1.7;
+}
+
+/* RESPONSIVE TASARIM */
+@media (max-width: 992px) {
+    .footer-grid { 
+        grid-template-columns: repeat(2, 1fr); 
+    }
+}
+
+@media (max-width: 768px) {
+    .footer-bottom-container {
+        flex-direction: column;
+        text-align: center;
+        justify-content: center;
+        gap: 15px;
+    }
+    
+    .footer-payments-wrapper {
+        flex-direction: column;
+        align-items: center;
+        gap: 12px;
+    }
+
+    .side-drawer {
+        width: 100vw;
+    }
+}
+
+@media (max-width: 576px) {
+    .footer-grid { 
+        grid-template-columns: 1fr; 
+        gap: 40px; 
+        text-align: center; 
+    }
+
+    .about-text-container {
+        align-items: center;
+    }
+
+    .footer-page-btn {
+        text-align: center;
+    }
+}

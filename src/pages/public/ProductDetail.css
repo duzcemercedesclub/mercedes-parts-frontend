@@ -1,0 +1,488 @@
+.product-detail-page {
+    padding: 30px 20px 80px;
+}
+
+/* Breadcrumb */
+.detail-breadcrumb {
+    font-size: 14px;
+    color: #888;
+    margin-bottom: 40px;
+}
+
+.detail-breadcrumb a {
+    color: #2b4c7e;
+    transition: color 0.2s;
+}
+
+.detail-breadcrumb a:hover {
+    color: #1a1a1a;
+}
+
+.detail-breadcrumb span {
+    color: #555;
+    font-weight: 500;
+}
+
+/* Layout */
+.detail-layout {
+    display: flex;
+    gap: 60px;
+}
+
+/* Sol Medya Alanı */
+.detail-media {
+    flex: 1;
+    max-width: 550px;
+}
+
+.main-image-wrapper {
+    background-color: #f7f8fa;
+    border: 1px solid #eaeaea;
+    border-radius: 4px;
+    padding: 20px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: relative;
+}
+
+.main-image-wrapper img {
+    max-width: 100%;
+    height: auto;
+    object-fit: contain;
+}
+
+/* Sağ Bilgi Alanı */
+.detail-info {
+    flex: 1;
+}
+
+.info-brand {
+    font-size: 13px;
+    font-weight: 600;
+    text-transform: uppercase;
+    color: #888;
+    letter-spacing: 1px;
+    display: block;
+    margin-bottom: 8px;
+}
+
+.info-title {
+    font-size: 32px;
+    font-weight: 600;
+    color: #1a1a1a;
+    margin-bottom: 15px;
+    line-height: 1.2;
+}
+
+/* Yıldızlar */
+.info-rating {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 25px;
+    font-size: 14px;
+}
+
+.info-rating .stars {
+    color: #ffb400;
+}
+
+.info-rating span {
+    color: #666;
+}
+
+/* Fiyat Satırı */
+.info-price-row {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    margin-bottom: 25px;
+}
+
+.info-old-price {
+    font-size: 18px;
+    color: #aaa;
+    text-decoration: line-through;
+    font-weight: 500;
+}
+
+.info-new-price {
+    font-size: 28px;
+    color: #d0021b;
+    font-weight: 700;
+}
+
+/* Açıklama */
+.info-desc {
+    font-size: 15px;
+    color: #555;
+    line-height: 1.6;
+    margin-bottom: 30px;
+    border-bottom: 1px solid #eaeaea;
+    padding-bottom: 25px;
+}
+
+/* Meta Bilgiler */
+.info-meta {
+    margin-bottom: 30px;
+    font-size: 14px;
+    color: #444;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.in-stock {
+    color: #2e7d32;
+    font-weight: 600;
+}
+
+.out-of-stock {
+    color: #c62828;
+    font-weight: 600;
+}
+
+/* Aksiyon Butonları Alanı */
+.info-actions {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    margin-bottom: 35px;
+    border-bottom: 1px solid #eaeaea;
+    padding-bottom: 30px;
+}
+
+/* Adet Seçici */
+.quantity-selector {
+    display: flex;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    overflow: hidden;
+    height: 48px;
+}
+
+.quantity-selector button {
+    width: 40px;
+    background-color: #f9f9f9;
+    border: none;
+    font-size: 18px;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+
+.quantity-selector button:hover:not(:disabled) {
+    background-color: #eaeaea;
+}
+
+.quantity-selector input {
+    width: 50px;
+    text-align: center;
+    border: none;
+    border-left: 1px solid #ccc;
+    border-right: 1px solid #ccc;
+    font-size: 15px;
+    font-weight: 600;
+    outline: none;
+}
+
+/* Sepete Ekle Butonu */
+.btn-add-to-cart {
+    flex-grow: 1;
+    max-width: 250px;
+    height: 48px;
+    background-color: #2b4c7e;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    font-size: 15px;
+    font-weight: 600;
+    cursor: pointer;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 10px;
+    transition: background-color 0.2s;
+}
+
+.btn-add-to-cart:hover {
+    background-color: #1d3557;
+}
+
+/* Favori Butonu */
+.btn-wishlist-toggle {
+    width: 48px;
+    height: 48px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    background-color: white;
+    font-size: 18px;
+    color: #444;
+    cursor: pointer;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    transition: all 0.2s;
+}
+
+.btn-wishlist-toggle:hover, .btn-wishlist-toggle.active {
+    border-color: #d0021b;
+    color: #d0021b;
+}
+
+.info-footer {
+    font-size: 14px;
+    color: #666;
+}
+
+/* ==========================================================
+   EKLENEN HTML FORMATLAMA VE TEMİZLEME STİLLERİ
+   ========================================================== */
+.formatted-description {
+    font-size: 15px;
+    line-height: 1.8;
+    color: #333;
+}
+
+.formatted-description p {
+    margin-bottom: 12px;
+}
+
+/* Veritabanından gelen beyaz arka plan ve çirkin renk tanımlarını sıfırla */
+.formatted-description span, 
+.formatted-description p, 
+.formatted-description div {
+    background-color: transparent !important;
+    color: inherit !important;
+}
+
+.formatted-description table {
+    width: 100%;
+    max-width: 650px;
+    border-collapse: collapse;
+    margin: 15px 0;
+}
+
+.formatted-description td, 
+.formatted-description th {
+    padding: 10px 14px;
+    border: 1px solid #e2e8f0;
+}
+
+.formatted-description tr:nth-child(even) {
+    background-color: #f8fafc;
+}
+
+/* RESPONSIVE */
+@media (max-width: 992px) {
+    .detail-layout {
+        flex-direction: column;
+        gap: 40px;
+    }
+    .detail-media {
+        max-width: 100%;
+    }
+}
+
+@media (max-width: 576px) {
+    .info-title {
+        font-size: 24px;
+    }
+    .info-actions {
+        flex-wrap: wrap;
+    }
+    .btn-add-to-cart {
+        max-width: 100%;
+    }
+}
+/* Tab Butonları */
+.tab-btn {
+    padding: 12px 5px;
+    border: none;
+    background: none;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    color: #777;
+    margin-bottom: -2px;
+    transition: all 0.2s ease;
+}
+
+.tab-btn.active {
+    color: #2b4c7e;
+    border-bottom: 3px solid #2b4c7e;
+}
+
+/* Yorumlar Sekmesi */
+.rating-summary-box {
+    background-color: #f8fafc;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    padding: 20px;
+    display: flex;
+    align-items: center;
+    max-width: 320px;
+}
+
+.score-side h2 {
+    font-size: 36px;
+    color: #1a1a1a;
+    margin: 0;
+}
+
+.score-side .stars {
+    color: #ffb400;
+    font-size: 18px;
+}
+
+.score-side p {
+    margin: 4px 0 0;
+    font-size: 13px;
+    color: #666;
+}
+
+.review-card {
+    border-bottom: 1px solid #eee;
+    padding: 16px 0;
+}
+
+.review-header {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 6px;
+}
+
+.user-name {
+    font-weight: 600;
+    color: #2b4c7e;
+}
+
+.review-date {
+    font-size: 12px;
+    color: #888;
+}
+
+.review-rating {
+    color: #ffb400;
+    font-size: 13px;
+    margin-bottom: 6px;
+}
+
+.review-comment {
+    color: #333;
+    margin: 0;
+}
+
+/* Soru & Cevap Sekmesi */
+.ask-question-card {
+    background: #f9fbfd;
+    border: 1px solid #d0dbe5;
+    border-radius: 8px;
+    padding: 20px;
+    margin-bottom: 30px;
+}
+
+.ask-question-card textarea {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    outline: none;
+    font-family: inherit;
+    resize: vertical;
+}
+
+.btn-submit-question {
+    margin-top: 10px;
+    background-color: #2b4c7e;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 6px;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.btn-submit-question:hover {
+    background-color: #1d3557;
+}
+
+.msg-alert {
+    padding: 10px 14px;
+    border-radius: 6px;
+    font-size: 13px;
+    margin-bottom: 12px;
+}
+
+.msg-alert.success {
+    background-color: #f6ffed;
+    border: 1px solid #b7eb8f;
+    color: #389e0d;
+}
+
+.msg-alert.error {
+    background-color: #fff2f0;
+    border: 1px solid #ffccc7;
+    color: #cf1322;
+}
+
+.question-card {
+    border: 1px solid #eaeaea;
+    border-radius: 8px;
+    padding: 16px;
+    margin-bottom: 16px;
+    background-color: #fff;
+}
+
+.q-box, .a-box {
+    display: flex;
+    gap: 12px;
+}
+
+.a-box {
+    margin-top: 12px;
+    padding-top: 12px;
+    border-top: 1px dashed #eee;
+}
+
+.badge-q, .badge-a {
+    padding: 2px 8px;
+    border-radius: 4px;
+    font-size: 11px;
+    font-weight: bold;
+    height: fit-content;
+}
+
+.badge-q {
+    background-color: #e6f7ff;
+    color: #0958d9;
+}
+
+.badge-a {
+    background-color: #f6ffed;
+    color: #389e0d;
+}
+
+.q-text, .a-text {
+    margin: 0;
+    color: #262626;
+    font-weight: 500;
+}
+
+.q-meta, .a-meta {
+    font-size: 11px;
+    color: #8c8c8c;
+    display: block;
+    margin-top: 2px;
+}
+
+.a-pending {
+    margin-top: 10px;
+    font-size: 12px;
+    color: #faad14;
+}
+
+.no-data-text {
+    color: #8c8c8c;
+    font-style: italic;
+}
