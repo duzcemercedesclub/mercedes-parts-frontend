@@ -5,6 +5,7 @@ import { ArrowLeftOutlined, UploadOutlined, SaveOutlined } from '@ant-design/ico
 import axios from 'axios';
 
 const { Title, Text } = Typography;
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
 
 const CategoryEdit = () => {
   const { id } = useParams();
@@ -18,7 +19,7 @@ const CategoryEdit = () => {
   useEffect(() => {
     const fetchCategoryDetail = async () => {
       try {
-        const response = await axios.get(`http://localhost:5000/api/categories/${id}`);
+        const response = await axios.get(`${API_URL}/api/categories/${id}`);
         form.setFieldsValue(response.data);
         setCurrentImage(response.data.image_url);
       } catch (error) {
@@ -41,7 +42,7 @@ const CategoryEdit = () => {
     }
 
     try {
-      await axios.put(`http://localhost:5000/api/categories/${id}`, formData, {
+      await axios.put(`${API_URL}/api/categories/${id}`, formData, {
         headers: { 'Content-Type': 'multipart/form-data' }
       });
       message.success('Kategori başarıyla güncellendi!');

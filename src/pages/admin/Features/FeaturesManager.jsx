@@ -3,6 +3,8 @@ import { Table, Button, Modal, Form, Input, Space, Popconfirm, message, Card } f
 import { PlusOutlined, EditOutlined, DeleteOutlined } from '@ant-design/icons';
 import axios from 'axios';
 
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+
 const FeaturesManager = () => {
   const [features, setFeatures] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -11,11 +13,10 @@ const FeaturesManager = () => {
   
   const [form] = Form.useForm();
 
-  // 1. Verileri Listeleme (Fetch)
   const fetchFeatures = async () => {
     setLoading(true);
     try {
-      const response = await axios.get('http://localhost:5000/api/features');
+      const response = await axios.get(`${API_URL}/api/features`);
       setFeatures(Array.isArray(response.data) ? response.data : []);
     } catch (error) {
       message.error('Özellikler yüklenirken bir hata oluştu.');
@@ -28,16 +29,13 @@ const FeaturesManager = () => {
     fetchFeatures();
   }, []);
 
-  // 2. Ekleme / Güncelleme Kayıt İşlemi (Submit)
   const handleSubmit = async (values) => {
     try {
       if (editingId) {
-        // Güncelleme
-        await axios.put(`http://localhost:5000/api/features/${editingId}`, values);
+        await axios.put(`${API_URL}/api/features/${editingId}`, values);
         message.success('Özellik başarıyla güncellendi.');
       } else {
-        // Yeni Ekleme
-        await axios.post('http://localhost:5000/api/features', values);
+        await axios.post(`${API_URL}/api/features`, values);
         message.success('Özellik başarıyla eklendi.');
       }
       setIsModalOpen(false);
@@ -49,10 +47,9 @@ const FeaturesManager = () => {
     }
   };
 
-  // 3. Silme İşlemi (Delete)
   const handleDelete = async (id) => {
     try {
-      await axios.delete(`http://localhost:5000/api/features/${id}`);
+      await axios.delete(`${API_URL}/api/features/${id}`);
       message.success('Özellik başarıyla silindi.');
       fetchFeatures();
     } catch (error) {
@@ -60,21 +57,18 @@ const FeaturesManager = () => {
     }
   };
 
-  // Düzenleme Modu Açılış Ayarları
   const handleEdit = (record) => {
     setEditingId(record.id);
     form.setFieldsValue(record);
     setIsModalOpen(true);
   };
 
-  // Ekleme Modu Açılış Ayarları
   const handleAddNew = () => {
     setEditingId(null);
     form.resetFields();
     setIsModalOpen(true);
   };
 
-  // Ant Design Tablo Sütun Yapısı
   const columns = [
     {
       title: 'İkon',
@@ -141,7 +135,6 @@ const FeaturesManager = () => {
         pagination={false} 
       />
 
-      {/* Ekleme ve Düzenleme Modalı */}
       <Modal
         title={editingId ? "Özelliği Düzenle" : "Yeni Özellik Ekle"}
         open={isModalOpen}

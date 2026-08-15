@@ -5,6 +5,7 @@ import { PlusOutlined, DeleteOutlined, EditOutlined } from '@ant-design/icons';
 import axios from 'axios';
 
 const { Title, Text } = Typography;
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
 
 const BrandList = () => {
   const [brands, setBrands] = useState([]);
@@ -14,7 +15,7 @@ const BrandList = () => {
   const fetchBrands = async () => {
     setLoading(true);
     try {
-      const response = await axios.get('http://localhost:5000/api/brands');
+      const response = await axios.get(`${API_URL}/api/brands`);
       setBrands(response.data);
     } catch (error) {
       message.error('Markalar yüklenirken bir hata oluştu.');
@@ -29,7 +30,7 @@ const BrandList = () => {
 
   const handleDelete = async (id) => {
     try {
-      await axios.delete(`http://localhost:5000/api/brands/${id}`);
+      await axios.delete(`${API_URL}/api/brands/${id}`);
       message.success('Marka başarıyla silindi.');
       fetchBrands();
     } catch (error) {

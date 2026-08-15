@@ -4,6 +4,7 @@ import { GoogleOutlined, SaveOutlined, FileSyncOutlined, SearchOutlined, ShareAl
 import axios from 'axios';
 
 const { TextArea } = Input;
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
 
 const SeoSettings = () => {
   const [form] = Form.useForm();
@@ -13,18 +14,16 @@ const SeoSettings = () => {
   const [fileList, setFileList] = useState([]);
   const [currentOgImageUrl, setCurrentOgImageUrl] = useState('');
 
-  // Karakter sınır takipleri için state'ler
   const [titleCharCount, setTitleCharCount] = useState(0);
   const [descCharCount, setDescCharCount] = useState(0);
 
-  // Form Değişiklik İzleyicisi (Önizleme ve Karakter Sayacı için)
   const [watchTitle, setWatchTitle] = useState('');
   const [watchDesc, setWatchDesc] = useState('');
 
   const fetchSeoSettings = async () => {
     setLoading(true);
     try {
-      const response = await axios.get('http://localhost:5000/api/seo-settings');
+      const response = await axios.get(`${API_URL}/api/seo-settings`);
       const data = response.data;
       if (data) {
         form.setFieldsValue(data);
@@ -56,12 +55,10 @@ const SeoSettings = () => {
     fetchSeoSettings();
   }, []);
 
-  // Dosya Yükleme Takipçisi
   const handleUploadChange = ({ fileList: newFileList }) => {
     setFileList(newFileList);
   };
 
-  // SEO Ayarlarını Kaydet (POST)
   const onSave = async (values) => {
     setSaving(true);
     const formData = new FormData();
@@ -83,7 +80,7 @@ const SeoSettings = () => {
     }
 
     try {
-      const res = await axios.post('http://localhost:5000/api/seo-settings', formData, {
+      const res = await axios.post(`${API_URL}/api/seo-settings`, formData, {
         headers: { 'Content-Type': 'multipart/form-data' },
       });
       message.success(res.data.message);
@@ -98,11 +95,10 @@ const SeoSettings = () => {
     }
   };
 
-  // Sitemap.xml Dosyasını Dinamik Tetikle (POST /generate-sitemap)
   const handleGenerateSitemap = async () => {
     setGeneratingSitemap(true);
     try {
-      const response = await axios.post('http://localhost:5000/api/seo-settings/generate-sitemap');
+      const response = await axios.post(`${API_URL}/api/seo-settings/generate-sitemap`);
       message.success(response.data.message);
     } catch (error) {
       message.error(error.response?.data?.message || 'Sitemap oluşturma işlemi başarısız.');
@@ -315,7 +311,7 @@ const SeoSettings = () => {
                 Sitemap.xml Dosyasını Oluştur / Güncelle
               </Button>
               <a 
-                href="http://localhost:5000/sitemap.xml" 
+                href={`${API_URL}/sitemap.xml`} 
                 target="_blank" 
                 rel="noopener noreferrer"
                 style={{ fontSize: '13px', display: 'flex', alignItems: 'center', gap: '4px' }}

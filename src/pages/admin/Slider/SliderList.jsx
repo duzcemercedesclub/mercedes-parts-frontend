@@ -5,6 +5,7 @@ import { PlusOutlined, DeleteOutlined, EditOutlined } from '@ant-design/icons';
 import axios from 'axios';
 
 const { Title, Text } = Typography;
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
 
 const SliderList = () => {
   const [sliders, setSliders] = useState([]);
@@ -14,7 +15,7 @@ const SliderList = () => {
   const fetchSliders = async () => {
     setLoading(true);
     try {
-      const response = await axios.get('http://localhost:5000/api/sliders');
+      const response = await axios.get(`${API_URL}/api/sliders`);
       setSliders(response.data);
     } catch (error) {
       message.error('Slaytlar yüklenirken bir hata oluştu.');
@@ -29,9 +30,9 @@ const SliderList = () => {
 
   const handleDelete = async (id) => {
     try {
-      await axios.delete(`http://localhost:5000/api/sliders/${id}`);
+      await axios.delete(`${API_URL}/api/sliders/${id}`);
       message.success('Slayt veritabanından ve listeden başarıyla kaldırıldı.');
-      fetchSliders(); // Listeyi tazele
+      fetchSliders();
     } catch (error) {
       message.error('Silme işlemi başarısız oldu.');
     }

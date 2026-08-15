@@ -7,6 +7,7 @@ import 'react-quill-new/dist/quill.snow.css';
 import axios from 'axios';
 
 const { Title, Text } = Typography;
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
 
 const ProductEdit = () => {
   const { id } = useParams();
@@ -25,12 +26,12 @@ const ProductEdit = () => {
   useEffect(() => {
     const fetchRelationsAndProduct = async () => {
       try {
-        const catRes = await axios.get('http://localhost:5000/api/categories');
-        const brandRes = await axios.get('http://localhost:5000/api/brands');
+        const catRes = await axios.get(`${API_URL}/api/categories`);
+        const brandRes = await axios.get(`${API_URL}/api/brands`);
         setCategories(catRes.data);
         setBrands(brandRes.data);
 
-        const prodRes = await axios.get(`http://localhost:5000/api/products/${id}`);
+        const prodRes = await axios.get(`${API_URL}/api/products/${id}`);
         const product = prodRes.data;
         
         form.setFieldsValue({
@@ -75,7 +76,7 @@ const ProductEdit = () => {
     }
 
     try {
-      await axios.put(`http://localhost:5000/api/products/${id}`, formData, {
+      await axios.put(`${API_URL}/api/products/${id}`, formData, {
         headers: { 'Content-Type': 'multipart/form-data' }
       });
       message.success('Ürün revizyonu başarıyla kaydedildi!');
@@ -147,7 +148,6 @@ const ProductEdit = () => {
                 <Input />
               </Form.Item>
 
-              {/* Şase Numarası (VIN) Düzenleme Alanı */}
               <Form.Item name="vin_code" label="Uyumlu Şase Numaraları (VIN)">
                 <Input placeholder="Örn: WDB2010241F123456" />
               </Form.Item>

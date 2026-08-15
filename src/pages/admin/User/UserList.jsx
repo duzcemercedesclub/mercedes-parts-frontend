@@ -4,6 +4,7 @@ import { UserOutlined, SearchOutlined, ReloadOutlined, EyeOutlined, PhoneOutline
 import axios from 'axios';
 
 const { Title, Text } = Typography;
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
 
 const UserList = () => {
   const [users, setUsers] = useState([]);
@@ -11,15 +12,13 @@ const UserList = () => {
   const [loading, setLoading] = useState(false);
   const [searchText, setSearchText] = useState('');
   
-  // Modal State Yönetimi
   const [selectedUser, setSelectedUser] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
 
-  // Backend'den kullanıcı verilerini çekme
   const fetchUsers = async () => {
     setLoading(true);
     try {
-      const res = await axios.get('http://localhost:5000/api/users');
+      const res = await axios.get(`${API_URL}/api/users`);
       setUsers(res.data);
       setFilteredUsers(res.data);
     } catch (error) {
@@ -33,7 +32,6 @@ const UserList = () => {
     fetchUsers();
   }, []);
 
-  // Aktif Dynamic Arama Fonksiyonu (Ad, Soyad, E-posta, Telefon ve Rol)
   const handleSearch = (e) => {
     const value = e.target.value.toLowerCase();
     setSearchText(value);
@@ -55,13 +53,11 @@ const UserList = () => {
     setFilteredUsers(filtered);
   };
 
-  // Detay Modalını Açan Fonksiyon
   const handleShowDetail = (record) => {
     setSelectedUser(record);
     setIsModalOpen(true);
   };
 
-  // Ant Design Tablo Sütun Yapılandırması
   const columns = [
     {
       title: 'Kullanıcı Adı Soyadı',
@@ -121,7 +117,6 @@ const UserList = () => {
 
   return (
     <div style={{ padding: '0px' }}>
-      {/* Üst Başlık ve Yenile Aksiyonu */}
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 24, flexWrap: 'wrap', gap: 16 }}>
         <div>
           <Title level={3} style={{ margin: 0 }}>Sistem Kullanıcıları</Title>
@@ -137,7 +132,6 @@ const UserList = () => {
         </Button>
       </div>
 
-      {/* Aktif Arama Filtreleme Kutusu */}
       <div style={{ marginBottom: 16, maxWidth: 400 }}>
         <Input
           placeholder="Ad, soyad, e-posta, telefon veya rol ile ara..."
@@ -148,7 +142,6 @@ const UserList = () => {
         />
       </div>
 
-      {/* Tablo Alanı */}
       <Card variant="borderless">
         <Table 
           columns={columns} 
@@ -164,7 +157,6 @@ const UserList = () => {
         />
       </Card>
 
-      {/* Ekranın Ortasında Açılan Tüm Kullanıcı Bilgileri Modalı */}
       <Modal
         title={
           <Space style={{ fontSize: 18 }}>
@@ -184,7 +176,6 @@ const UserList = () => {
       >
         {selectedUser && (
           <div style={{ marginTop: 20 }}>
-            {/* 1. KİŞİSEL BİLGİLER */}
             <Descriptions title="Kişisel Bilgiler" bordered size="small" column={2}>
               <Descriptions.Item label="Adı Soyadı">
                 <strong>{selectedUser.name} {selectedUser.surname}</strong>
@@ -217,7 +208,6 @@ const UserList = () => {
 
             <Divider style={{ margin: '16px 0' }} />
 
-            {/* 2. ADRES BİLGİLERİ */}
             <Descriptions title="Adres Bilgileri" bordered size="small" column={2}>
               <Descriptions.Item label="Adres Başlığı">
                 <HomeOutlined style={{ marginRight: 6, color: '#fa8c16' }} />
@@ -239,7 +229,6 @@ const UserList = () => {
 
             <Divider style={{ margin: '16px 0' }} />
 
-            {/* 3. FATURA BİLGİLERİ */}
             <Descriptions title="Fatura Bilgileri" bordered size="small" column={2}>
               <Descriptions.Item label="Fatura Tipi">
                 {selectedUser.parsedBilling?.invoiceType ? selectedUser.parsedBilling.invoiceType.toUpperCase() : 'Bireysel'}
@@ -261,7 +250,6 @@ const UserList = () => {
 
             <Divider style={{ margin: '16px 0' }} />
 
-            {/* 4. BİLDİRİM VE BANKA BİLGİLERİ */}
             <Descriptions title="Bildirim Tercihleri & Ödeme Bilgisi" bordered size="small" column={2}>
               <Descriptions.Item label="SMS Bildirimi">
                 <Tag color={selectedUser.sms_notification ? 'green' : 'volcano'}>

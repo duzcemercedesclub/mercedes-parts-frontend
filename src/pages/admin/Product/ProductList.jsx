@@ -5,6 +5,7 @@ import { PlusOutlined, DeleteOutlined, EditOutlined, BarcodeOutlined, CarOutline
 import axios from 'axios';
 
 const { Title, Text } = Typography;
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
 
 const ProductList = () => {
   const [products, setProducts] = useState([]);
@@ -14,7 +15,7 @@ const ProductList = () => {
   const fetchProducts = async () => {
     setLoading(true);
     try {
-      const response = await axios.get('http://localhost:5000/api/products');
+      const response = await axios.get(`${API_URL}/api/products`);
       setProducts(response.data);
     } catch (error) {
       message.error('Ürünler yüklenirken bir hata oluştu.');
@@ -29,7 +30,7 @@ const ProductList = () => {
 
   const handleDelete = async (id) => {
     try {
-      await axios.delete(`http://localhost:5000/api/products/${id}`);
+      await axios.delete(`${API_URL}/api/products/${id}`);
       message.success('Ürün başarıyla silindi.');
       fetchProducts();
     } catch (error) {

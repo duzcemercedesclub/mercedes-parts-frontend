@@ -5,6 +5,7 @@ import { PlusOutlined, DeleteOutlined, EditOutlined, FileTextOutlined } from '@a
 import axios from 'axios';
 
 const { Title, Text } = Typography;
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
 
 const PageList = () => {
   const [pages, setPages] = useState([]);
@@ -14,7 +15,7 @@ const PageList = () => {
   const fetchPages = async () => {
     setLoading(true);
     try {
-      const response = await axios.get('http://localhost:5000/api/pages');
+      const response = await axios.get(`${API_URL}/api/pages`);
       setPages(response.data);
     } catch (error) {
       message.error('Sayfa listesi yüklenirken hata oluştu.');
@@ -29,7 +30,7 @@ const PageList = () => {
 
   const handleDelete = async (id) => {
     try {
-      await axios.delete(`http://localhost:5000/api/pages/${id}`);
+      await axios.delete(`${API_URL}/api/pages/${id}`);
       message.success('Sayfa başarıyla silindi.');
       fetchPages();
     } catch (error) {

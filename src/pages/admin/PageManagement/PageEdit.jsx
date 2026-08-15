@@ -7,8 +7,8 @@ import 'react-quill-new/dist/quill.snow.css';
 import axios from 'axios';
 
 const { Title, Text } = Typography;
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
 
-// ReactQuill araç çubuğu konfigürasyonu
 const modules = {
   toolbar: [
     [{ header: [1, 2, 3, 4, false] }],
@@ -28,8 +28,7 @@ const PageEdit = () => {
   useEffect(() => {
     const fetchPageDetail = async () => {
       try {
-        const response = await axios.get(`http://localhost:5000/api/pages/${id}`);
-        // Veritabanındaki verileri form alanlarına dolduruyoruz
+        const response = await axios.get(`${API_URL}/api/pages/${id}`);
         form.setFieldsValue({
           ...response.data,
           is_active: response.data.is_active === 1
@@ -46,7 +45,7 @@ const PageEdit = () => {
   const onFinish = async (values) => {
     setSubmitting(true);
     try {
-      await axios.put(`http://localhost:5000/api/pages/${id}`, values);
+      await axios.put(`${API_URL}/api/pages/${id}`, values);
       message.success('Sayfa içeriği başarıyla güncellendi!');
       navigate('/admin/pages');
     } catch (error) {

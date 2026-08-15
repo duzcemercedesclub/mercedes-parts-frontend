@@ -3,6 +3,8 @@ import { Table, Button, Modal, Form, Input, Space, Popconfirm, message, Card, Sw
 import { PlusOutlined, EditOutlined, DeleteOutlined, ShareAltOutlined } from '@ant-design/icons';
 import axios from 'axios';
 
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+
 const SocialMediaManager = () => {
   const [links, setLinks] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -11,11 +13,10 @@ const SocialMediaManager = () => {
   
   const [form] = Form.useForm();
 
-  // 1. Sosyal Medya Verilerini Getir
   const fetchLinks = async () => {
     setLoading(true);
     try {
-      const response = await axios.get('http://localhost:5000/api/social-links');
+      const response = await axios.get(`${API_URL}/api/social-links`);
       setLinks(Array.isArray(response.data) ? response.data : []);
     } catch (error) {
       message.error('Sosyal medya adresleri yüklenirken hata oluştu.');
@@ -28,10 +29,9 @@ const SocialMediaManager = () => {
     fetchLinks();
   }, []);
 
-  // 2. Aktif/Pasif Durumu Hızlı Değiştir (PATCH)
   const handleToggleStatus = async (id) => {
     try {
-      const response = await axios.patch(`http://localhost:5000/api/social-links/${id}/toggle`);
+      const response = await axios.patch(`${API_URL}/api/social-links/${id}/toggle`);
       message.success(response.data.message);
       fetchLinks();
     } catch (error) {
@@ -39,7 +39,6 @@ const SocialMediaManager = () => {
     }
   };
 
-  // 3. Ekleme veya Güncelleme İşlemini Kaydet
   const handleSubmit = async (values) => {
     try {
       const payload = {
@@ -48,10 +47,10 @@ const SocialMediaManager = () => {
       };
 
       if (editingId) {
-        await axios.put(`http://localhost:5000/api/social-links/${editingId}`, payload);
+        await axios.put(`${API_URL}/api/social-links/${editingId}`, payload);
         message.success('Sosyal medya başarıyla güncellendi.');
       } else {
-        await axios.post('http://localhost:5000/api/social-links', payload);
+        await axios.post(`${API_URL}/api/social-links`, payload);
         message.success('Sosyal medya başarıyla eklendi.');
       }
       setIsModalOpen(false);
@@ -63,10 +62,9 @@ const SocialMediaManager = () => {
     }
   };
 
-  // 4. Sosyal Medya Sil
   const handleDelete = async (id) => {
     try {
-      await axios.delete(`http://localhost:5000/api/social-links/${id}`);
+      await axios.delete(`${API_URL}/api/social-links/${id}`);
       message.success('Sosyal medya başarıyla silindi.');
       fetchLinks();
     } catch (error) {

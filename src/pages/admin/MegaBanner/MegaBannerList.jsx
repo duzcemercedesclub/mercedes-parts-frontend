@@ -5,6 +5,7 @@ import { PlusOutlined, DeleteOutlined, EditOutlined } from '@ant-design/icons';
 import axios from 'axios';
 
 const { Title, Text } = Typography;
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
 
 const MegaBannerList = () => {
   const [banners, setBanners] = useState([]);
@@ -14,7 +15,7 @@ const MegaBannerList = () => {
   const fetchBanners = async () => {
     setLoading(true);
     try {
-      const response = await axios.get('http://localhost:5000/api/mega-banners');
+      const response = await axios.get(`${API_URL}/api/mega-banners`);
       setBanners(response.data);
     } catch (error) {
       message.error('Banner listesi yüklenemedi.');
@@ -29,7 +30,7 @@ const MegaBannerList = () => {
 
   const handleDelete = async (id) => {
     try {
-      await axios.delete(`http://localhost:5000/api/mega-banners/${id}`);
+      await axios.delete(`${API_URL}/api/mega-banners/${id}`);
       message.success('Banner başarıyla silindi.');
       fetchBanners();
     } catch (error) {

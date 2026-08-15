@@ -7,6 +7,7 @@ import 'react-quill-new/dist/quill.snow.css';
 import axios from 'axios';
 
 const { Title, Text } = Typography;
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
 
 const ProductAdd = () => {
   const [form] = Form.useForm();
@@ -22,8 +23,8 @@ const ProductAdd = () => {
   useEffect(() => {
     const fetchRelations = async () => {
       try {
-        const catRes = await axios.get('http://localhost:5000/api/categories');
-        const brandRes = await axios.get('http://localhost:5000/api/brands');
+        const catRes = await axios.get(`${API_URL}/api/categories`);
+        const brandRes = await axios.get(`${API_URL}/api/brands`);
         setCategories(catRes.data);
         setBrands(brandRes.data);
       } catch (error) {
@@ -57,7 +58,7 @@ const ProductAdd = () => {
     formData.append('image', fileList[0]);
 
     try {
-      await axios.post('http://localhost:5000/api/products', formData, {
+      await axios.post(`${API_URL}/api/products`, formData, {
         headers: { 'Content-Type': 'multipart/form-data' }
       });
       message.success('Ürün başarıyla eklendi!');
@@ -132,7 +133,6 @@ const ProductAdd = () => {
                 <Input placeholder="Örn: BOS-190D-8921" />
               </Form.Item>
 
-              {/* Şase Numarası (VIN) Giriş Alanı */}
               <Form.Item name="vin_code" label="Uyumlu Şase Numaraları (VIN)" tooltip="Birden fazla şase numarasını virgül ile ayırarak yazabilirsiniz. Örn: WDB201024, WDB124020">
                 <Input placeholder="Örn: WDB2010241F123456, WDB124020" />
               </Form.Item>

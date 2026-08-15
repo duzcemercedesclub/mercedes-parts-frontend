@@ -5,6 +5,7 @@ import { ArrowLeftOutlined, UploadOutlined, SaveOutlined } from '@ant-design/ico
 import axios from 'axios';
 
 const { Title, Text } = Typography;
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
 
 const BrandAdd = () => {
   const [form] = Form.useForm();
@@ -24,7 +25,7 @@ const BrandAdd = () => {
     formData.append('image', fileList[0]);
 
     try {
-      await axios.post('http://localhost:5000/api/brands', formData, {
+      await axios.post(`${API_URL}/api/brands`, formData, {
         headers: { 'Content-Type': 'multipart/form-data' }
       });
       message.success('Marka ve logosu başarıyla veritabanına kaydedildi!');

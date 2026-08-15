@@ -4,6 +4,7 @@ import { MailOutlined, SaveOutlined, SendOutlined, SafetyOutlined } from '@ant-d
 import axios from 'axios';
 
 const { Option } = Select;
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
 
 const SmtpSettings = () => {
   const [form] = Form.useForm();
@@ -13,11 +14,10 @@ const SmtpSettings = () => {
   const [isTestModalOpen, setIsTestModalOpen] = useState(false);
   const [testEmail, setTestEmail] = useState('');
 
-  // 1. SMTP Ayarlarını API'den Çek
   const fetchSmtpSettings = async () => {
     setLoading(true);
     try {
-      const response = await axios.get('http://localhost:5000/api/smtp-settings');
+      const response = await axios.get(`${API_URL}/api/smtp-settings`);
       if (response.data) {
         form.setFieldsValue(response.data);
       }
@@ -32,11 +32,10 @@ const SmtpSettings = () => {
     fetchSmtpSettings();
   }, []);
 
-  // 2. Ayarları Veritabanına Kaydet (POST)
   const onSave = async (values) => {
     setSaving(true);
     try {
-      await axios.post('http://localhost:5000/api/smtp-settings', values);
+      await axios.post(`${API_URL}/api/smtp-settings`, values);
       message.success('SMTP e-posta ayarları başarıyla güncellendi.');
     } catch (error) {
       message.error('Ayarlar kaydedilemedi.');
@@ -45,7 +44,6 @@ const SmtpSettings = () => {
     }
   };
 
-  // 3. SMTP Ayarlarını Test Etmek İçin Mail Gönder (POST /test)
   const handleSendTestMail = async () => {
     if (!testEmail) {
       message.warning('Lütfen geçerli bir alıcı e-posta adresi yazın.');
@@ -53,11 +51,10 @@ const SmtpSettings = () => {
     }
 
     setTesting(true);
-    // Formdaki güncel alanları alıyoruz (Kaydetmeden önce de test edebilmek için)
     const currentFormValues = form.getFieldsValue();
 
     try {
-      const response = await axios.post('http://localhost:5000/api/smtp-settings/test', {
+      const response = await axios.post(`${API_URL}/api/smtp-settings/test`, {
         test_email: testEmail,
         ...currentFormValues
       });
@@ -112,8 +109,6 @@ const SmtpSettings = () => {
           onFinish={onSave}
         >
           <Row gutter={24}>
-            
-            {/* SOL KOLON - SUNUCU PARAMETRELERİ */}
             <Col xs={24} md={12}>
               <Card type="inner" title="Sunucu Bağlantı Ayarları" style={{ height: '100%' }}>
                 <Form.Item 
@@ -167,7 +162,6 @@ const SmtpSettings = () => {
               </Card>
             </Col>
 
-            {/* SAĞ KOLON - ALICI/GÖNDERİCİ DETAYLARI */}
             <Col xs={24} md={12}>
               <Card type="inner" title="Gönderici (Kimlik) Bilgileri" style={{ height: '100%' }}>
                 <Form.Item 
@@ -213,7 +207,6 @@ const SmtpSettings = () => {
         </Form>
       </Card>
 
-      {/* ANLIK BAĞLANTI SINA / TEST MAİLİ MODALI */}
       <Modal
         title="SMTP Bağlantı ve İletim Testi"
         open={isTestModalOpen}

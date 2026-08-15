@@ -3,6 +3,8 @@ import { Form, Input, Button, Switch, Upload, Card, Row, Col, Space, message, Sp
 import { UploadOutlined, SaveOutlined, UndoOutlined, SettingOutlined } from '@ant-design/icons';
 import axios from 'axios';
 
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+
 const GeneralAndLogoSettings = () => {
   const [form] = Form.useForm();
   const [loading, setLoading] = useState(false);
@@ -15,7 +17,7 @@ const GeneralAndLogoSettings = () => {
   const fetchSettings = async () => {
     setLoading(true);
     try {
-      const response = await axios.get('http://localhost:5000/api/settings');
+      const response = await axios.get(`${API_URL}/api/settings`);
       const data = response.data;
       
       form.setFieldsValue({
@@ -60,7 +62,6 @@ const GeneralAndLogoSettings = () => {
     setSaving(true);
     const formData = new FormData();
 
-    // Normal Input Değerlerini Ekle
     formData.append('title', values.title || '');
     formData.append('logo_text_small', values.logo_text_small || '');
     formData.append('logo_text_large', values.logo_text_large || '');
@@ -70,22 +71,19 @@ const GeneralAndLogoSettings = () => {
     formData.append('instagram_url', values.instagram_url || '');
     formData.append('twitter_url', values.twitter_url || '');
 
-    // Boolean (Switch) Değerlerini Ekle
     formData.append('use_image_logo', useImageLogo ? '1' : '0');
     formData.append('show_facebook', values.show_facebook ? '1' : '0');
     formData.append('show_instagram', values.show_instagram ? '1' : '0');
     formData.append('show_twitter', values.show_twitter ? '1' : '0');
 
-    // Mevcut logo URL'i koru
     formData.append('current_image', currentImageUrl);
 
-    // Yeni dosya yüklendiyse ekle
     if (fileList.length > 0 && fileList[0].originFileObj) {
       formData.append('image', fileList[0].originFileObj);
     }
 
     try {
-      const res = await axios.post('http://localhost:5000/api/settings', formData, {
+      const res = await axios.post(`${API_URL}/api/settings`, formData, {
         headers: { 'Content-Type': 'multipart/form-data' },
       });
       message.success('Sistem ayarları başarıyla kaydedildi.');
@@ -103,7 +101,7 @@ const GeneralAndLogoSettings = () => {
   // Ayarları Varsayılana Döndür (SİLME / RESET)
   const handleReset = async () => {
     try {
-      await axios.delete('http://localhost:5000/api/settings/reset');
+      await axios.delete(`${API_URL}/api/settings/reset`);
       message.success('Varsayılan ayarlara başarıyla dönüldü.');
       setFileList([]);
       setCurrentImageUrl('');
@@ -146,8 +144,6 @@ const GeneralAndLogoSettings = () => {
           }}
         >
           <Row gutter={24}>
-            
-            {/* LOGO AYARLARI BÖLÜMÜ */}
             <Col xs={24} md={12}>
               <Card type="inner" title="Logo Ayarları" style={{ height: '100%' }}>
                 <Form.Item label="Logo Türü Seçimi" name="use_image_logo" valuePropName="checked">
@@ -164,7 +160,7 @@ const GeneralAndLogoSettings = () => {
                       listType="picture"
                       fileList={fileList}
                       onChange={handleUploadChange}
-                      beforeUpload={() => false} // Otomatik yüklemeyi kapat
+                      beforeUpload={() => false}
                       maxCount={1}
                     >
                       <Button icon={<UploadOutlined />}>Logo Seç (PNG önerilir)</Button>
@@ -191,7 +187,6 @@ const GeneralAndLogoSettings = () => {
               </Card>
             </Col>
 
-            {/* BAR & METIN AYARLARI BÖLÜMÜ */}
             <Col xs={24} md={12}>
               <Card type="inner" title="Üst Bar (Top Bar) Ayarları" style={{ height: '100%' }}>
                 <Form.Item label="Tarayıcı & Site Başlığı" name="title">
@@ -211,7 +206,6 @@ const GeneralAndLogoSettings = () => {
 
           <Divider />
 
-          {/* SOSYAL MEDYA KONTROLLERİ */}
           <Card type="inner" title="Sosyal Medya Link ve Görünürlük Kontrolleri" style={{ marginBottom: '24px' }}>
             <Row gutter={16}>
               <Col xs={24} sm={8}>

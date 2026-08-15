@@ -5,6 +5,7 @@ import { ArrowLeftOutlined, UploadOutlined, SaveOutlined } from '@ant-design/ico
 import axios from 'axios';
 
 const { Title, Text } = Typography;
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
 
 const CategoryAdd = () => {
   const [form] = Form.useForm();
@@ -24,7 +25,7 @@ const CategoryAdd = () => {
     formData.append('image', fileList[0]);
 
     try {
-      await axios.post('http://localhost:5000/api/categories', formData, {
+      await axios.post(`${API_URL}/api/categories`, formData, {
         headers: { 'Content-Type': 'multipart/form-data' }
       });
       message.success('Kategori Cloudinary yüklemesiyle birlikte başarıyla oluşturuldu!');

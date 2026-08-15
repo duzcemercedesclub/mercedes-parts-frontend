@@ -6,6 +6,8 @@ import { VisaLogo, MastercardLogo, MaestroLogo, TroyLogo, AmexLogo } from '../..
 
 const { TextArea } = Input;
 
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+
 const FooterSettings = () => {
   const [form] = Form.useForm();
   const [loading, setLoading] = useState(false);
@@ -15,7 +17,7 @@ const FooterSettings = () => {
   const fetchFooterSettings = async () => {
     setLoading(true);
     try {
-      const response = await axios.get('http://localhost:5000/api/footer');
+      const response = await axios.get(`${API_URL}/api/footer`);
       if (response.data) {
         form.setFieldsValue({
           ...response.data,
@@ -41,7 +43,7 @@ const FooterSettings = () => {
   const onSave = async (values) => {
     setSaving(true);
     try {
-      await axios.post('http://localhost:5000/api/footer', {
+      await axios.post(`${API_URL}/api/footer`, {
         ...values,
         show_visa: values.show_visa ? 1 : 0,
         show_mastercard: values.show_mastercard ? 1 : 0,

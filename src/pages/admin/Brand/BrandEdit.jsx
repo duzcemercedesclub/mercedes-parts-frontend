@@ -5,6 +5,7 @@ import { ArrowLeftOutlined, UploadOutlined, SaveOutlined } from '@ant-design/ico
 import axios from 'axios';
 
 const { Title, Text } = Typography;
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
 
 const BrandEdit = () => {
   const { id } = useParams();
@@ -18,7 +19,7 @@ const BrandEdit = () => {
   useEffect(() => {
     const fetchBrandDetail = async () => {
       try {
-        const response = await axios.get(`http://localhost:5000/api/brands/${id}`);
+        const response = await axios.get(`${API_URL}/api/brands/${id}`);
         form.setFieldsValue(response.data);
         setCurrentImage(response.data.image_url);
       } catch (error) {
@@ -41,7 +42,7 @@ const BrandEdit = () => {
     }
 
     try {
-      await axios.put(`http://localhost:5000/api/brands/${id}`, formData, {
+      await axios.put(`${API_URL}/api/brands/${id}`, formData, {
         headers: { 'Content-Type': 'multipart/form-data' }
       });
       message.success('Marka başarıyla güncellendi!');

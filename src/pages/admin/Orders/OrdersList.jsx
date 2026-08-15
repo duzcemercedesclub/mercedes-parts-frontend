@@ -26,6 +26,7 @@ import {
 
 const { Title, Text } = Typography;
 const { Option } = Select;
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
 
 const CARGO_COMPANIES = [
   'Yurtiçi Kargo',
@@ -65,11 +66,10 @@ const OrdersList = () => {
   const fetchOrders = async () => {
     setLoading(true);
     try {
-      const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:5000';
-      let res = await fetch(`${apiUrl}/api/admin/orders`);
+      let res = await fetch(`${API_URL}/api/admin/orders`);
       
       if (!res.ok) {
-        res = await fetch(`${apiUrl}/api/orders`);
+        res = await fetch(`${API_URL}/api/orders`);
       }
 
       const data = await res.json();
@@ -140,8 +140,7 @@ const OrdersList = () => {
 
     setUpdating(true);
     try {
-      const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:5000';
-      const response = await fetch(`${apiUrl}/api/orders/${selectedOrder.id}`, {
+      const response = await fetch(`${API_URL}/api/orders/${selectedOrder.id}`, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(values),
@@ -358,7 +357,7 @@ const OrdersList = () => {
                   key: 'name',
                   render: (text, item) => {
                     const productId = item.productId || item.product_id || item.id;
-                    const productUrl = `/product/${productId}`; // Projenizdeki ürün yönlendirme rotasına göre güncelleyebilirsiniz (örn: /product-detail/${productId} veya /products/${productId})
+                    const productUrl = `/product/${productId}`;
 
                     return (
                       <a 

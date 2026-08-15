@@ -5,6 +5,7 @@ import { ArrowLeftOutlined, UploadOutlined, SaveOutlined } from '@ant-design/ico
 import axios from 'axios';
 
 const { Title, Text } = Typography;
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
 
 const MegaBannerEdit = () => {
   const { id } = useParams();
@@ -18,7 +19,7 @@ const MegaBannerEdit = () => {
   useEffect(() => {
     const fetchBannerDetail = async () => {
       try {
-        const response = await axios.get(`http://localhost:5000/api/mega-banners/${id}`);
+        const response = await axios.get(`${API_URL}/api/mega-banners/${id}`);
         form.setFieldsValue(response.data);
         setCurrentImage(response.data.image_url);
       } catch (error) {
@@ -44,7 +45,7 @@ const MegaBannerEdit = () => {
     }
 
     try {
-      await axios.put(`http://localhost:5000/api/mega-banners/${id}`, formData, {
+      await axios.put(`${API_URL}/api/mega-banners/${id}`, formData, {
         headers: { 'Content-Type': 'multipart/form-data' }
       });
       message.success('Mega Banner başarıyla güncellendi!');

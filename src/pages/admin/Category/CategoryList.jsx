@@ -5,6 +5,7 @@ import { PlusOutlined, DeleteOutlined, EditOutlined } from '@ant-design/icons';
 import axios from 'axios';
 
 const { Title, Text } = Typography;
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
 
 const CategoryList = () => {
   const [categories, setCategories] = useState([]);
@@ -14,7 +15,7 @@ const CategoryList = () => {
   const fetchCategories = async () => {
     setLoading(true);
     try {
-      const response = await axios.get('http://localhost:5000/api/categories');
+      const response = await axios.get(`${API_URL}/api/categories`);
       setCategories(response.data);
     } catch (error) {
       message.error('Kategoriler yüklenirken bir hata oluştu.');
@@ -29,7 +30,7 @@ const CategoryList = () => {
 
   const handleDelete = async (id) => {
     try {
-      await axios.delete(`http://localhost:5000/api/categories/${id}`);
+      await axios.delete(`${API_URL}/api/categories/${id}`);
       message.success('Kategori başarıyla silindi.');
       fetchCategories();
     } catch (error) {

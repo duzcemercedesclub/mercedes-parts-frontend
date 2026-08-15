@@ -7,8 +7,8 @@ import 'react-quill-new/dist/quill.snow.css';
 import axios from 'axios';
 
 const { Title, Text } = Typography;
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
 
-// ReactQuill araç çubuğu konfigürasyonu
 const modules = {
   toolbar: [
     [{ header: [1, 2, 3, 4, false] }],
@@ -26,7 +26,7 @@ const PageAdd = () => {
   const onFinish = async (values) => {
     setSubmitting(true);
     try {
-      await axios.post('http://localhost:5000/api/pages', values);
+      await axios.post(`${API_URL}/api/pages`, values);
       message.success('Kurumsal sayfa başarıyla oluşturuldu ve yayına alındı!');
       navigate('/admin/pages');
     } catch (error) {

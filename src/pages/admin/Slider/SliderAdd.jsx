@@ -5,6 +5,7 @@ import { ArrowLeftOutlined, UploadOutlined, SaveOutlined } from '@ant-design/ico
 import axios from 'axios';
 
 const { Title, Text } = Typography;
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
 
 const SliderAdd = () => {
   const [form] = Form.useForm();
@@ -20,16 +21,15 @@ const SliderAdd = () => {
 
     setUploading(true);
     
-    // Resim ve Metinleri taşımak için FormData mimarisi kullanıyoruz
     const formData = new FormData();
     formData.append('title', values.title);
     formData.append('subtitle', values.subtitle || '');
     formData.append('discount', values.discount || '');
     formData.append('btn_link', values.btn_link || '/shop');
-    formData.append('image', fileList[0]); // Seçilen gerçek dosya
+    formData.append('image', fileList[0]);
 
     try {
-      await axios.post('http://localhost:5000/api/sliders', formData, {
+      await axios.post(`${API_URL}/api/sliders`, formData, {
         headers: { 'Content-Type': 'multipart/form-data' }
       });
       message.success('Slider başarıyla Cloudinary\'ye yüklendi ve MySQL\'e kaydedildi!');
@@ -64,12 +64,11 @@ const SliderAdd = () => {
 
           <Form.Item name="btn_link" label="Buton Linki"><Input placeholder="/shop" /></Form.Item>
 
-          {/* BİLGİSAYARDAN DOSYA SEÇME ALANI */}
           <Form.Item label="Slayt Arka Plan Resmi *" required>
             <Upload
               beforeUpload={(file) => {
-                setFileList([file]); // Sadece tek bir resim kabul ediyoruz
-                return false; // Otomatik yüklemeyi kapatıyoruz, formla gidecek
+                setFileList([file]);
+                return false;
               }}
               fileList={fileList}
               onRemove={() => setFileList([])}
