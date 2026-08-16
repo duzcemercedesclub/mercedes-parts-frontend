@@ -2,14 +2,14 @@ import React, { useState, useEffect, useRef } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { useCart } from '../../../context/CartContext.jsx';
-import { useAuth } from '../../../context/AuthContext.jsx'; // AuthContext eklendi
+import { useAuth } from '../../../context/AuthContext.jsx';
 import './Header.css';
 
 const Header = () => {
   const [isSticky, setIsSticky] = useState(false);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false); // Mobil menü durumu
 
-  // AuthContext'ten canlı kullanıcı verisini ve logout fonksiyonunu çekiyoruz
   const { user, logout } = useAuth();
 
   // ARAMA STATE'LERİ
@@ -21,11 +21,9 @@ const Header = () => {
 
   const apiUrl = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000';
   
-  // CartContext'ten sepet ve wishlist verileri
   const { cart, wishlist } = useCart();
   const navigate = useNavigate();
 
-  // Dinamik Sistem Ayarları State Alanı
   const [settings, setSettings] = useState({
     logo_text_small: 'DUZCE',
     logo_text_large: 'MERCEDESCLUB',
@@ -41,12 +39,10 @@ const Header = () => {
     twitter_url: '#'
   });
 
-  // Sepetteki ve Favorilerdeki toplam ürün adedi
   const totalCartItems = cart ? cart.reduce((total, item) => total + item.quantity, 0) : 0;
   const totalWishlistItems = wishlist ? wishlist.length : 0;
 
   useEffect(() => {
-    // Veritabanından Dinamik Genel Ayarları Çek
     const loadSettings = async () => {
       try {
         const response = await axios.get(`${apiUrl}/api/settings`);
@@ -63,7 +59,6 @@ const Header = () => {
 
     loadSettings();
 
-    // Sticky header efekti
     const handleScroll = () => {
       if (window.scrollY > 40) {
         setIsSticky(true);
@@ -75,14 +70,12 @@ const Header = () => {
     return () => window.removeEventListener('scroll', handleScroll);
   }, [apiUrl]);
 
-  // Arama Penceresi Açıldığında İnput'a Odaklanma
   useEffect(() => {
     if (isSearchOpen && searchInputRef.current) {
       searchInputRef.current.focus();
     }
   }, [isSearchOpen]);
 
-  // Canlı Arama İşlemi (Debounce ile backend sorgusu)
   useEffect(() => {
     const fetchSearchResults = async () => {
       if (searchQuery.trim().length >= 2) {
@@ -90,7 +83,7 @@ const Header = () => {
         try {
           const response = await axios.get(`${apiUrl}/api/products?search=${encodeURIComponent(searchQuery.trim())}`);
           const products = Array.isArray(response.data) ? response.data : (response.data.products || []);
-          setSearchResults(products.slice(0, 5)); // En fazla 5 canlı sonuç göster
+          setSearchResults(products.slice(0, 5));
         } catch (error) {
           console.error("Arama yapılırken hata oluştu:", error);
         } finally {
@@ -108,7 +101,6 @@ const Header = () => {
     return () => clearTimeout(timer);
   }, [searchQuery, apiUrl]);
 
-  // Arama Formu Gönderildiğinde (Enter veya 'Ara' Butonu)
   const handleSearchSubmit = (e) => {
     e.preventDefault();
     if (searchQuery.trim()) {
@@ -116,12 +108,14 @@ const Header = () => {
       setIsSearchOpen(false);
       setSearchQuery('');
       setSearchResults([]);
+      setIsMobileMenuOpen(false);
     }
   };
 
   const handleLogout = () => {
-    logout(); // AuthContext üzerinden güvenli çıkış işlemi
+    logout();
     setIsDropdownOpen(false);
+    setIsMobileMenuOpen(false);
     navigate('/');
   };
 
@@ -130,8 +124,6 @@ const Header = () => {
       
       {/* ÜST BAR (TOP BAR) */}
       <div className="top-bar">
-        
-        {/* Sosyal Medya İkonları */}
         <div className="social-icons">
           {settings.show_facebook === 1 && (
             <a href={settings.facebook_url} target="_blank" rel="noopener noreferrer">
@@ -150,12 +142,10 @@ const Header = () => {
           )}
         </div>
 
-        {/* Kampanya Yazısı */}
         <div className="promo-text">
           {settings.promo_text}
         </div>
 
-        {/* Para Birimi */}
         <div className="currency-selector">
           <span>{settings.currency} <i className="fas fa-chevron-down"></i></span>
         </div>
@@ -169,26 +159,36 @@ const Header = () => {
             : { position: 'relative', zIndex: 1050 }
         }
       >
-        <nav className="nav-menu">
+        {/* MOBİL HAMBURGER BUTONU */}
+        <button 
+          className="mobile-menu-toggle" 
+          onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+          aria-label="Menüyü Aç/Kapat"
+        >
+          <i className={isMobileMenuOpen ? "fas fa-times" : "fas fa-bars"}></i>
+        </button>
+
+        {/* NAVİGASYON MENÜSÜ */}
+        <nav className={`nav-menu ${isMobileMenuOpen ? 'mobile-active' : ''}`}>
           <ul>
-            <li><Link to="/">Anasayfa</Link></li>
-            <li><Link to="/shop">Mağaza <i className="fas fa-chevron-down"></i></Link></li>
-            <li><Link to="/contact">İletişim</Link></li>
+            <li><Link to="/" onClick={() => setIsMobileMenuOpen(false)}>Anasayfa</Link></li>
+            <li><Link to="/shop" onClick={() => setIsMobileMenuOpen(false)}>Mağaza <i className="fas fa-chevron-down"></i></Link></li>
+            <li><Link to="/contact" onClick={() => setIsMobileMenuOpen(false)}>İletişim</Link></li>
           </ul>
         </nav>
 
         {/* DİNAMİK LOGO ALANI */}
         <div className="logo">
           {settings.use_image_logo === 1 && settings.logo_url ? (
-            <Link to="/">
+            <Link to="/" onClick={() => setIsMobileMenuOpen(false)}>
               <img 
                 src={settings.logo_url} 
                 alt="Logo" 
-                style={{ maxHeight: '55px', objectFit: 'contain', display: 'block' }} 
+                style={{ maxHeight: '45px', objectFit: 'contain', display: 'block' }} 
               />
             </Link>
           ) : (
-            <Link to="/" style={{ textDecoration: 'none', color: 'inherit', textAlign: 'center' }}>
+            <Link to="/" onClick={() => setIsMobileMenuOpen(false)} style={{ textDecoration: 'none', color: 'inherit', textAlign: 'center' }}>
               <div className="logo-small">{settings.logo_text_small}</div>
               <div className="logo-large">{settings.logo_text_large}</div>
             </Link>
@@ -201,7 +201,10 @@ const Header = () => {
           <button 
             type="button" 
             className="icon-link search-toggle-btn"
-            onClick={() => setIsSearchOpen(!isSearchOpen)}
+            onClick={() => {
+              setIsSearchOpen(!isSearchOpen);
+              setIsMobileMenuOpen(false);
+            }}
             title="Ürün Ara"
           >
             <i className="fas fa-search"></i>
@@ -211,6 +214,7 @@ const Header = () => {
           {user ? (
             <div 
               className="account-menu-wrapper"
+              onClick={() => setIsDropdownOpen(!isDropdownOpen)}
               onMouseEnter={() => setIsDropdownOpen(true)}
               onMouseLeave={() => setIsDropdownOpen(false)}
             >
@@ -226,11 +230,11 @@ const Header = () => {
               {isDropdownOpen && (
                 <div className="account-dropdown-menu">
                   <div className="dropdown-pointer-arrow"></div>
-                  <Link to="/hesabim/siparislerim" className="dropdown-menu-item">Siparişlerim</Link>
-                  <Link to="/hesabim/soru-taleplerim" className="dropdown-menu-item">Soru ve Taleplerim</Link>
-                  <Link to="/hesabim/kullanici-bilgilerim" className="dropdown-menu-item">Kullanıcı Bilgilerim</Link>
-                  <Link to="/hesabim/degerlendirmelerim" className="dropdown-menu-item">Değerlendirmelerim</Link>
-                  <Link to="/hesabim/kuponlarim" className="dropdown-menu-item">Kuponlarım</Link>
+                  <Link to="/hesabim/siparislerim" className="dropdown-menu-item" onClick={() => setIsMobileMenuOpen(false)}>Siparişlerim</Link>
+                  <Link to="/hesabim/soru-taleplerim" className="dropdown-menu-item" onClick={() => setIsMobileMenuOpen(false)}>Soru ve Taleplerim</Link>
+                  <Link to="/hesabim/kullanici-bilgilerim" className="dropdown-menu-item" onClick={() => setIsMobileMenuOpen(false)}>Kullanıcı Bilgilerim</Link>
+                  <Link to="/hesabim/degerlendirmelerim" className="dropdown-menu-item" onClick={() => setIsMobileMenuOpen(false)}>Değerlendirmelerim</Link>
+                  <Link to="/hesabim/kuponlarim" className="dropdown-menu-item" onClick={() => setIsMobileMenuOpen(false)}>Kuponlarım</Link>
                   <div className="dropdown-item-divider"></div>
                   <button onClick={handleLogout} className="dropdown-menu-item logout-action-btn">
                     Çıkış Yap
@@ -239,19 +243,19 @@ const Header = () => {
               )}
             </div>
           ) : (
-            <Link to="/login" className="icon-link">
+            <Link to="/login" className="icon-link" onClick={() => setIsMobileMenuOpen(false)}>
               <i className="far fa-user"></i>
             </Link>
           )}
 
           {/* WISHLIST (FAVORİLER) ALANI */}
-          <Link to="/wishlist" className="icon-link wishlist-icon">
+          <Link to="/wishlist" className="icon-link wishlist-icon" onClick={() => setIsMobileMenuOpen(false)}>
             <i className="far fa-heart"></i>
             {totalWishlistItems > 0 && <span className="badge">{totalWishlistItems}</span>}
           </Link>
 
           {/* SEPET ALANI */}
-          <Link to="/cart" className="icon-link wishlist-icon">
+          <Link to="/cart" className="icon-link wishlist-icon" onClick={() => setIsMobileMenuOpen(false)}>
             <i className="fas fa-basket-shopping"></i>
             {totalCartItems > 0 && <span className="badge">{totalCartItems}</span>}
           </Link>
