@@ -6,25 +6,16 @@ import {
   Typography,
   Tag,
   Button,
-  Input,
   Space,
   message,
-  Statistic,
   Segmented
 } from 'antd';
-import {
-  CopyOutlined,
-  TagOutlined,
-  ThunderboltOutlined,
-  GiftOutlined,
-  PlusOutlined,
-  InfoCircleOutlined
-} from '@ant-design/icons';
+import { CopyOutlined } from '@ant-design/icons';
+import './responsive.css';
 
 const { Title, Text } = Typography;
 
 const MyCoupons = () => {
-  const [couponInput, setCouponInput] = useState('');
   const [activeTab, setActiveTab] = useState('Tümü (14)');
 
   const coupons = [
@@ -79,18 +70,9 @@ const MyCoupons = () => {
     message.success(`${code} kupon kodu panoya kopyalandı!`);
   };
 
-  const handleAddCoupon = () => {
-    if (!couponInput) {
-      message.warning('Lütfen bir kupon kodu giriniz.');
-      return;
-    }
-    message.success('Kupon kodunuz hesabınıza tanımlandı!');
-    setCouponInput('');
-  };
-
   return (
-    <div>
-      {/* Üst Kupon Ekleme Barı */}
+    <div style={{ maxWidth: '100%', overflowX: 'hidden' }}>
+      {/* Üst Başlık Kartı */}
       <Card
         style={{
           borderRadius: 16,
@@ -98,23 +80,18 @@ const MyCoupons = () => {
           border: '1px solid #f0f0f0',
           boxShadow: '0 2px 8px rgba(0,0,0,0.03)'
         }}
-        bodyStyle={{ padding: '16px 24px' }}
+        styles={{ body: { padding: '16px 20px' } }}
       >
-        <Row justify="space-between" align="middle" gutter={[16, 16]}>
-          <Col xs={24} md={10}>
-            <Title level={4} style={{ margin: 0, fontWeight: 700 }}>
-              Kuponlarım
-            </Title>
-            <Text type="secondary" style={{ fontSize: 13 }}>
-              Hesabınıza tanımlı indirim kuponları ve puan durumu.
-            </Text>
-          </Col>
-        </Row>
+        <Title level={4} style={{ margin: 0, fontWeight: 700 }}>
+          Kuponlarım
+        </Title>
+        <Text type="secondary" style={{ fontSize: 13 }}>
+          Hesabınıza tanımlı indirim kuponları ve puan durumu.
+        </Text>
       </Card>
 
-
-      {/* Kategori Filtre Tabları */}
-      <div style={{ marginBottom: 20 }}>
+      {/* Kategori Filtre Tabları (Mobilde Yatay Kaydırılabilir) */}
+      <div style={{ marginBottom: 20 }} className="responsive-segmented-container">
         <Segmented
           options={['Tümü (14)', 'Katlanan Kuponlarım (1)', 'Sepet Kuponlarım (13)', 'Ürün Kuponlarım (1)']}
           value={activeTab}
@@ -123,24 +100,14 @@ const MyCoupons = () => {
         />
       </div>
 
-      {/* Özel Bilet Görünümlü Kupon Kartları Grid */}
+      {/* Kupon Kartları Grid */}
       <Row gutter={[16, 16]}>
         {coupons.map((c) => (
           <Col xs={24} lg={12} key={c.id}>
-            <div
-              style={{
-                display: 'flex',
-                backgroundColor: '#fff',
-                borderRadius: 14,
-                overflow: 'hidden',
-                border: '1px solid #e8e8e8',
-                boxShadow: '0 4px 12px rgba(0,0,0,0.03)',
-                position: 'relative'
-              }}
-            >
+            <div className="coupon-ticket-card">
               {/* Sol İçerik Alanı */}
-              <div style={{ flex: 1, padding: '18px 20px' }}>
-                <Space style={{ marginBottom: 6 }}>
+              <div className="coupon-ticket-left">
+                <Space style={{ marginBottom: 6, flexWrap: 'wrap' }}>
                   <Tag color="magenta" style={{ borderRadius: 10 }}>
                     {c.badge}
                   </Tag>
@@ -165,41 +132,25 @@ const MyCoupons = () => {
                 </Button>
               </div>
 
-              {/* Bilet Ayrım Çizgisi (Kupon Çentiği) */}
-              <div
-                style={{
-                  width: 1,
-                  borderRight: '2px dashed #d9d9d9',
-                  position: 'relative',
-                  margin: '10px 0'
-                }}
-              />
+              {/* Bilet Ayrım Çizgisi */}
+              <div className="coupon-ticket-divider" />
 
               {/* Sağ İndirim Tutarı Alanı */}
-              <div
-                style={{
-                  width: 130,
-                  backgroundColor: '#fafafa',
-                  display: 'flex',
-                  flexDirection: 'column',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  padding: 12,
-                  textAlign: 'center'
-                }}
-              >
-                <Text strong style={{ fontSize: 22, color: '#eb2f96', lineHeight: 1 }}>
-                  {c.discount}
-                </Text>
-                <Text type="secondary" style={{ fontSize: 12, marginTop: 4 }}>
-                  İNDİRİM
-                </Text>
+              <div className="coupon-ticket-right">
+                <div>
+                  <Text strong style={{ fontSize: 22, color: '#eb2f96', lineHeight: 1 }}>
+                    {c.discount}
+                  </Text>
+                  <Text type="secondary" style={{ fontSize: 11, display: 'block' }}>
+                    İNDİRİM
+                  </Text>
+                </div>
                 <Button
                   type="link"
                   size="small"
-                  style={{ fontSize: 11, marginTop: 8, padding: 0 }}
+                  style={{ fontSize: 11, padding: 0 }}
                 >
-                  Detayı Gör
+                  Detay
                 </Button>
               </div>
             </div>

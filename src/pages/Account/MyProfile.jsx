@@ -37,6 +37,7 @@ import {
 } from 'turkey-neighbourhoods';
 import { useAuth } from '../../context/AuthContext';
 import { useNavigate } from 'react-router-dom';
+import './responsive.css';
 
 const { Title, Text, Paragraph } = Typography;
 const { Option } = Select;
@@ -59,7 +60,6 @@ const getCities = () => {
 
 const getCityObject = (cityName) => {
   if (!cityName) return null;
-
   try {
     const cities = getTurkeyCities();
     if (!Array.isArray(cities)) return null;
@@ -77,15 +77,9 @@ const getCityObject = (cityName) => {
 
 const getDistricts = (cityName) => {
   if (!cityName) return [];
-
   try {
     const city = getCityObject(cityName);
-
-    if (!city?.code) {
-      console.warn(`"${cityName}" için il kodu bulunamadı.`);
-      return [];
-    }
-
+    if (!city?.code) return [];
     const districts = getDistrictsByCityCode(String(city.code));
     return Array.isArray(districts) ? districts : [];
   } catch (error) {
@@ -96,15 +90,9 @@ const getDistricts = (cityName) => {
 
 const getNeighborhoods = (cityName, districtName) => {
   if (!cityName || !districtName) return [];
-
   try {
     const city = getCityObject(cityName);
-
-    if (!city?.code) {
-      console.warn(`"${cityName}" için il kodu bulunamadı.`);
-      return [];
-    }
-
+    if (!city?.code) return [];
     const districts = getDistricts(cityName);
 
     const matchedDistrict =
@@ -116,13 +104,9 @@ const getNeighborhoods = (cityName, districtName) => {
       String(city.code),
       matchedDistrict
     );
-
     return Array.isArray(neighborhoods) ? neighborhoods : [];
   } catch (error) {
-    console.error(
-      `"${cityName} / ${districtName}" mahalleleri alınamadı:`,
-      error
-    );
+    console.error(`"${cityName} / ${districtName}" mahalleleri alınamadı:`, error);
     return [];
   }
 };
@@ -136,14 +120,12 @@ const MyProfile = () => {
   const [submitting, setSubmitting] = useState(false);
   const [profileData, setProfileData] = useState(null);
 
-  // Form tanımları
   const [userInfoForm] = Form.useForm();
   const [addressForm] = Form.useForm();
   const [passwordForm] = Form.useForm();
   const [communicationsForm] = Form.useForm();
   const [paymentsForm] = Form.useForm();
 
-  // Adres ve Fatura State'leri
   const [addressDetailText, setAddressDetailText] = useState('');
   const [invoiceType, setInvoiceType] = useState('bireysel');
 
@@ -157,8 +139,7 @@ const MyProfile = () => {
   const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
 
   useEffect(() => {
-    const cities = getCities();
-    setCitiesList(cities);
+    setCitiesList(getCities());
   }, []);
 
   const fetchProfile = async () => {
@@ -169,7 +150,6 @@ const MyProfile = () => {
         headers: { Authorization: `Bearer ${token}` }
       });
       const data = await response.json();
-
       if (response.ok) {
         setProfileData(data);
       } else {
@@ -226,7 +206,6 @@ const MyProfile = () => {
 
       setSelectedCity(currentCity);
       setDistrictsList(districts);
-
       setSelectedDistrict(currentDistrict || '');
       setNeighborhoodsList(neighborhoods);
 
@@ -275,24 +254,15 @@ const MyProfile = () => {
       district: undefined,
       neighborhood: undefined
     });
-
-    if (districts.length === 0) {
-      message.warning(`${cityName} için ilçe verisi bulunamadı.`);
-    }
   };
 
   const handleDistrictChange = (districtName) => {
     setSelectedDistrict(districtName);
-
     const activeCity = addressForm.getFieldValue('city') || selectedCity;
 
     if (activeCity && districtName) {
       const neighborhoods = getNeighborhoods(activeCity, districtName);
       setNeighborhoodsList(neighborhoods);
-
-      if (neighborhoods.length === 0) {
-        message.warning(`${districtName} için mahalle verisi bulunamadı.`);
-      }
     } else {
       setNeighborhoodsList([]);
     }
@@ -316,12 +286,11 @@ const MyProfile = () => {
       });
 
       const data = await response.json();
-
       if (response.ok) {
         message.success(data.message || successMsg);
         setActiveModal(null);
         await fetchProfile();
-        if (fetchUserProfile) await fetchUserProfile(); // AuthContext senkronizasyonu
+        if (fetchUserProfile) await fetchUserProfile();
       } else {
         message.error(data.message || 'İşlem başarısız.');
       }
@@ -387,7 +356,7 @@ const MyProfile = () => {
   }
 
   return (
-    <div>
+    <div style={{ maxWidth: '100%', overflowX: 'hidden' }}>
       <Card
         style={{
           borderRadius: 16,
@@ -395,7 +364,7 @@ const MyProfile = () => {
           border: '1px solid #f0f0f0',
           boxShadow: '0 2px 8px rgba(0,0,0,0.03)'
         }}
-        styles={{ body: { padding: 20 } }}
+        styles={{ body: { padding: 16 } }}
       >
         <Title level={4} style={{ margin: 0, fontWeight: 700 }}>
           Hesap Ayarlarım
@@ -417,34 +386,35 @@ const MyProfile = () => {
                 height: '100%',
                 boxShadow: '0 2px 6px rgba(0,0,0,0.02)'
               }}
-              styles={{ body: { padding: 20 } }}
+              styles={{ body: { padding: 16 } }}
             >
-              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12 }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 12, overflow: 'hidden' }}>
                   <div
                     style={{
-                      width: 48,
-                      height: 48,
+                      width: 44,
+                      height: 44,
                       borderRadius: 10,
                       backgroundColor: '#fafafa',
                       display: 'flex',
                       alignItems: 'center',
                       justifyContent: 'center',
-                      border: '1px solid #f0f0f0'
+                      border: '1px solid #f0f0f0',
+                      flexShrink: 0
                     }}
                   >
                     {item.icon}
                   </div>
-                  <div>
-                    <Title level={5} style={{ margin: 0, fontSize: 15 }}>
+                  <div style={{ overflow: 'hidden' }}>
+                    <Title level={5} style={{ margin: 0, fontSize: 14 }} ellipsis>
                       {item.title}
                     </Title>
-                    <Text type="secondary" style={{ fontSize: 12 }}>
+                    <Text type="secondary" style={{ fontSize: 12 }} ellipsis>
                       Yönetmek için tıklayın
                     </Text>
                   </div>
                 </div>
-                <RightOutlined style={{ color: '#bfbfbf', fontSize: 14 }} />
+                <RightOutlined style={{ color: '#bfbfbf', fontSize: 14, flexShrink: 0 }} />
               </div>
             </Card>
           </Col>
@@ -460,25 +430,26 @@ const MyProfile = () => {
               backgroundColor: '#fff2f0',
               height: '100%'
             }}
-            styles={{ body: { padding: 20 } }}
+            styles={{ body: { padding: 16 } }}
           >
-            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12 }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
                 <div
                   style={{
-                    width: 48,
-                    height: 48,
+                    width: 44,
+                    height: 44,
                     borderRadius: 10,
                     backgroundColor: '#fff',
                     display: 'flex',
                     alignItems: 'center',
-                    justifyContent: 'center'
+                    justifyContent: 'center',
+                    flexShrink: 0
                   }}
                 >
                   <LogoutOutlined style={{ fontSize: 24, color: '#ff4d4f' }} />
                 </div>
                 <div>
-                  <Title level={5} style={{ margin: 0, fontSize: 15, color: '#ff4d4f' }}>
+                  <Title level={5} style={{ margin: 0, fontSize: 14, color: '#ff4d4f' }}>
                     Çıkış Yap
                   </Title>
                   <Text type="secondary" style={{ fontSize: 12 }}>
@@ -486,7 +457,7 @@ const MyProfile = () => {
                   </Text>
                 </div>
               </div>
-              <RightOutlined style={{ color: '#ff4d4f', fontSize: 14 }} />
+              <RightOutlined style={{ color: '#ff4d4f', fontSize: 14, flexShrink: 0 }} />
             </div>
           </Card>
         </Col>
@@ -509,12 +480,12 @@ const MyProfile = () => {
           style={{ marginTop: 16 }}
         >
           <Row gutter={12}>
-            <Col span={12}>
+            <Col xs={24} sm={12}>
               <Form.Item label="Ad" name="name" rules={[{ required: true }]}>
                 <Input prefix={<UserOutlined />} />
               </Form.Item>
             </Col>
-            <Col span={12}>
+            <Col xs={24} sm={12}>
               <Form.Item label="Soyad" name="surname">
                 <Input prefix={<UserOutlined />} />
               </Form.Item>
@@ -547,7 +518,8 @@ const MyProfile = () => {
         footer={null}
         zIndex={2000}
         centered
-        width={560}
+        width="100%"
+        style={{ maxWidth: 560 }}
         destroyOnHidden
       >
         <Form
@@ -565,7 +537,7 @@ const MyProfile = () => {
           </Form.Item>
 
           <Row gutter={12}>
-            <Col span={8}>
+            <Col xs={10} sm={8}>
               <Form.Item name="phoneCode" initialValue="+90">
                 <Select virtual={false} size="large" style={{ borderRadius: 8 }}>
                   <Option value="+90">TR (+90)</Option>
@@ -574,7 +546,7 @@ const MyProfile = () => {
                 </Select>
               </Form.Item>
             </Col>
-            <Col span={16}>
+            <Col xs={14} sm={16}>
               <Form.Item name="phone" rules={[{ required: true, message: 'Telefon numarası zorunludur.' }]}>
                 <Input size="large" placeholder="(539) 784-4089" style={{ borderRadius: 8 }} />
               </Form.Item>
@@ -592,7 +564,7 @@ const MyProfile = () => {
               marginBottom: 24
             }}
           >
-            <InfoCircleFilled style={{ color: '#1677ff', fontSize: 18 }} />
+            <InfoCircleFilled style={{ color: '#1677ff', fontSize: 18, flexShrink: 0 }} />
             <Text style={{ color: '#1f1f1f', fontSize: 13 }}>
               Kargo bilgilerini bu numaraya SMS ile ileteceğiz.
             </Text>
@@ -603,14 +575,14 @@ const MyProfile = () => {
           </Title>
 
           <Row gutter={12}>
-            <Col span={12}>
+            <Col xs={24} sm={12}>
               <Form.Item name="country" label="Ülke" rules={[{ required: true }]}>
                 <Select virtual={false} size="large" style={{ borderRadius: 8 }}>
                   <Option value="Türkiye">Türkiye</Option>
                 </Select>
               </Form.Item>
             </Col>
-            <Col span={12}>
+            <Col xs={24} sm={12}>
               <Form.Item name="city" label="Şehir" rules={[{ required: true, message: 'Şehir seçiniz.' }]}>
                 <Select
                   virtual={false}
@@ -703,7 +675,7 @@ const MyProfile = () => {
             <Radio.Group
               onChange={(e) => setInvoiceType(e.target.value)}
               value={invoiceType}
-              style={{ display: 'flex', gap: 24 }}
+              style={{ display: 'flex', gap: 24, flexWrap: 'wrap' }}
             >
               <Radio value="bireysel">Bireysel</Radio>
               <Radio value="kurumsal">Kurumsal</Radio>
@@ -727,7 +699,7 @@ const MyProfile = () => {
                   marginBottom: 24
                 }}
               >
-                <InfoCircleFilled style={{ color: '#1677ff', fontSize: 18 }} />
+                <InfoCircleFilled style={{ color: '#1677ff', fontSize: 18, flexShrink: 0 }} />
                 <Text style={{ color: '#1f1f1f', fontSize: 13 }}>
                   Fatura bilgilerini düzenlemek için T.C. kimlik numarana ihtiyaç duyuyoruz.
                 </Text>
@@ -740,12 +712,12 @@ const MyProfile = () => {
                   <Input size="large" style={{ borderRadius: 8 }} />
                 </Form.Item>
               </Col>
-              <Col span={12}>
+              <Col xs={24} sm={12}>
                 <Form.Item name="taxOffice" label="Vergi Dairesi" rules={[{ required: true, message: 'Vergi dairesi giriniz.' }]}>
                   <Input size="large" style={{ borderRadius: 8 }} />
                 </Form.Item>
               </Col>
-              <Col span={12}>
+              <Col xs={24} sm={12}>
                 <Form.Item name="taxNo" label="Vergi Numarası" rules={[{ required: true, message: 'Vergi numarası giriniz.' }]}>
                   <Input size="large" style={{ borderRadius: 8 }} />
                 </Form.Item>

@@ -26,6 +26,7 @@ import {
   CalendarOutlined
 } from '@ant-design/icons';
 import { useAuth } from '../../context/AuthContext';
+import './responsive.css';
 
 const { Title, Text, Paragraph } = Typography;
 const { Option } = Select;
@@ -93,7 +94,6 @@ const MyReviews = () => {
     fetchMonthlyReviews();
   }, [token, selectedYear, selectedMonth]);
 
-  // Yeni Değerlendirme Ekleme (Tamamlanmış Sipariş İçin)
   const handleAddReview = async (values) => {
     if (!selectedProduct || !token) return;
 
@@ -116,7 +116,7 @@ const MyReviews = () => {
       const data = await response.json();
 
       if (response.ok) {
-        message.success(data.message || 'Değerlendirmeniz alındı. Mağaza onayından sonra yayınlanacaktır.');
+        message.success(data.message || 'Değerlendirmeniz alındı.');
         setReviewModalOpen(false);
         form.resetFields();
         await fetchMonthlyReviews();
@@ -154,7 +154,7 @@ const MyReviews = () => {
   };
 
   return (
-    <div>
+    <div style={{ maxWidth: '100%', overflowX: 'hidden' }}>
       <Card
         style={{
           borderRadius: 16,
@@ -162,28 +162,31 @@ const MyReviews = () => {
           border: '1px solid #f0f0f0',
           boxShadow: '0 2px 8px rgba(0,0,0,0.03)'
         }}
-        styles={{ body: { padding: 20 } }}
+        styles={{ body: { padding: 16 } }}
       >
         <Title level={4} style={{ margin: '0 0 16px 0', fontWeight: 700 }}>
           Değerlendirmelerim
         </Title>
         <Row justify="space-between" align="middle" gutter={[16, 16]}>
-          <Col xs={24} md={14}>
-            <Segmented
-              options={['Değerlendirme Bekleyenler', 'Geçmiş Değerlendirmelerim']}
-              value={activeTab}
-              onChange={setActiveTab}
-              size="large"
-              style={{ padding: 4, backgroundColor: '#f5f5f5' }}
-            />
+          <Col xs={24} lg={14}>
+            <div className="responsive-segmented-container">
+              <Segmented
+                options={['Değerlendirme Bekleyenler', 'Geçmiş Değerlendirmelerim']}
+                value={activeTab}
+                onChange={setActiveTab}
+                size="large"
+                style={{ padding: 4, backgroundColor: '#f5f5f5' }}
+              />
+            </div>
           </Col>
-          <Col xs={24} md={10} style={{ textAlign: 'right' }}>
+          <Col xs={24} lg={10} className="mobile-text-left" style={{ textAlign: 'right' }}>
             <Space wrap>
               <CalendarOutlined style={{ color: '#8c8c8c' }} />
               <Select
                 value={selectedMonth}
                 onChange={setSelectedMonth}
-                style={{ width: 120, borderRadius: 8 }}
+                style={{ width: 110, borderRadius: 8 }}
+                virtual={false}
               >
                 {monthsList.map((m) => (
                   <Option key={m.value} value={m.value}>
@@ -194,7 +197,8 @@ const MyReviews = () => {
               <Select
                 value={selectedYear}
                 onChange={setSelectedYear}
-                style={{ width: 100, borderRadius: 8 }}
+                style={{ width: 90, borderRadius: 8 }}
+                virtual={false}
               >
                 <Option value="2026">2026</Option>
                 <Option value="2025">2025</Option>
@@ -217,31 +221,31 @@ const MyReviews = () => {
         ) : (
           <Row gutter={[16, 16]}>
             {pendingReviews.map((item) => (
-              <Col xs={24} md={12} key={`${item.orderId}-${item.productId}`}>
+              <Col xs={24} sm={12} key={`${item.orderId}-${item.productId}`}>
                 <Card
                   style={{
                     borderRadius: 12,
                     border: '1px solid #e8e8e8',
                     boxShadow: '0 2px 6px rgba(0,0,0,0.02)'
                   }}
-                  styles={{ body: { padding: 16 } }}
+                  styles={{ body: { padding: 14 } }}
                 >
-                  <div style={{ display: 'flex', gap: 14 }}>
+                  <div style={{ display: 'flex', gap: 12 }}>
                     <Avatar
                       shape="square"
-                      size={68}
+                      size={60}
                       src={item.productImage || 'https://via.placeholder.com/100'}
                       style={{ borderRadius: 8, flexShrink: 0 }}
                     />
-                    <div style={{ flex: 1 }}>
-                      <Title level={5} ellipsis={{ rows: 2 }} style={{ margin: 0, fontSize: 13, height: 38 }}>
+                    <div style={{ flex: 1, minWidth: 0 }}>
+                      <Title level={5} ellipsis={{ rows: 2 }} style={{ margin: 0, fontSize: 13, minHeight: 36 }}>
                         {item.productName}
                       </Title>
                       <Text type="secondary" style={{ fontSize: 11, display: 'block', margin: '4px 0' }}>
-                        Teslim Tarihi: {new Date(item.orderDate).toLocaleDateString('tr-TR')}
+                        Teslim: {new Date(item.orderDate).toLocaleDateString('tr-TR')}
                       </Text>
 
-                      <Row justify="end" align="middle" style={{ marginTop: 12 }}>
+                      <Row justify="end" align="middle" style={{ marginTop: 8 }}>
                         <Button
                           type="primary"
                           size="small"
@@ -253,7 +257,7 @@ const MyReviews = () => {
                           }}
                           style={{ borderRadius: 6, backgroundColor: '#1677ff' }}
                         >
-                          Ürünü Değerlendir
+                          Değerlendir
                         </Button>
                       </Row>
                     </div>
@@ -276,32 +280,32 @@ const MyReviews = () => {
                 style={{ borderRadius: 12, border: '1px solid #e8e8e8' }}
                 styles={{ body: { padding: 16 } }}
               >
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
-                  <div style={{ display: 'flex', gap: 14 }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: 12 }}>
+                  <div style={{ display: 'flex', gap: 12, flex: 1, minWidth: 200 }}>
                     <Avatar
                       shape="square"
-                      size={54}
+                      size={50}
                       src={rev.productImage || 'https://via.placeholder.com/100'}
                       style={{ borderRadius: 8, flexShrink: 0 }}
                     />
-                    <div>
-                      <Title level={5} style={{ margin: 0, fontSize: 15 }}>
+                    <div style={{ minWidth: 0 }}>
+                      <Title level={5} style={{ margin: 0, fontSize: 14 }} ellipsis>
                         {rev.productName}
                       </Title>
-                      <Space style={{ margin: '4px 0' }}>
-                        <Rate disabled defaultValue={Number(rev.rating)} style={{ fontSize: 13 }} />
-                        <Text type="secondary" style={{ fontSize: 12 }}>
+                      <Space style={{ margin: '4px 0', flexWrap: 'wrap' }}>
+                        <Rate disabled defaultValue={Number(rev.rating)} style={{ fontSize: 12 }} />
+                        <Text type="secondary" style={{ fontSize: 11 }}>
                           {new Date(rev.createdAt).toLocaleDateString('tr-TR')}
                         </Text>
                       </Space>
                       {rev.comment && (
-                        <Paragraph style={{ margin: '4px 0 0 0', color: '#434343' }}>
+                        <Paragraph style={{ margin: '4px 0 0 0', color: '#434343', wordBreak: 'break-word' }}>
                           "{rev.comment}"
                         </Paragraph>
                       )}
                     </div>
                   </div>
-                  {renderStatusTag(rev.status)}
+                  <div>{renderStatusTag(rev.status)}</div>
                 </div>
               </Card>
             ))}
@@ -328,7 +332,7 @@ const MyReviews = () => {
             style={{ marginTop: 12 }}
           >
             <Text strong style={{ fontSize: 14 }}>{selectedProduct.productName}</Text>
-            
+
             <Form.Item
               name="rating"
               label="Puanınız"

@@ -23,6 +23,7 @@ import {
   RightOutlined
 } from '@ant-design/icons';
 import { useAuth } from '../../context/AuthContext';
+import './responsive.css';
 
 const { Title, Text, Paragraph } = Typography;
 const { Option } = Select;
@@ -41,7 +42,6 @@ const MyQuestions = () => {
   const [form] = Form.useForm();
   const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
 
-  // 1. Kullanıcının Sorularını Çek
   const fetchMyQuestions = async () => {
     if (!token) return;
     setLoading(true);
@@ -63,7 +63,6 @@ const MyQuestions = () => {
     }
   };
 
-  // 2. Ürünleri Çek
   const fetchProducts = async () => {
     try {
       const response = await fetch(`${API_URL}/api/products`);
@@ -81,7 +80,6 @@ const MyQuestions = () => {
     fetchProducts();
   }, [token]);
 
-  // Yeni Soru Gönder
   const handleCreateQuestion = async (values) => {
     if (!token) {
       message.error('Oturum açmanız gerekmektedir.');
@@ -127,7 +125,7 @@ const MyQuestions = () => {
   );
 
   return (
-    <div>
+    <div style={{ maxWidth: '100%', overflowX: 'hidden' }}>
       <Card
         style={{
           borderRadius: 16,
@@ -135,7 +133,7 @@ const MyQuestions = () => {
           border: '1px solid #f0f0f0',
           boxShadow: '0 2px 8px rgba(0,0,0,0.03)'
         }}
-        styles={{ body: { padding: 20 } }}
+        styles={{ body: { padding: 16 } }}
       >
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 12 }}>
           <div>
@@ -143,13 +141,14 @@ const MyQuestions = () => {
               Soru ve Cevaplarım
             </Title>
             <Text type="secondary" style={{ fontSize: 13 }}>
-              Satıcılara yönelttiğiniz tüm soruları ve mağaza yanıtlarını buradan takip edebilirsiniz.
+              Satıcılara yönelttiğiniz tüm soruları ve yanıtları takip edebilirsiniz.
             </Text>
           </div>
           <Button
             type="primary"
             icon={<PlusOutlined />}
             size="large"
+            className="mobile-full-width"
             onClick={() => setIsModalOpen(true)}
             style={{ borderRadius: 8, backgroundColor: '#1677ff' }}
           >
@@ -188,29 +187,29 @@ const MyQuestions = () => {
                 border: '1px solid #e8e8e8',
                 boxShadow: '0 2px 6px rgba(0,0,0,0.02)'
               }}
-              styles={{ body: { padding: '16px 20px' } }}
+              styles={{ body: { padding: 16 } }}
             >
-              <div style={{ display: 'flex', gap: 16, alignItems: 'flex-start' }}>
+              <div style={{ display: 'flex', gap: 12, alignItems: 'flex-start', flexWrap: 'nowrap' }}>
                 <Avatar
                   shape="square"
-                  size={64}
+                  size={52}
                   src={item.productImage}
                   icon={<ShopOutlined />}
                   style={{ borderRadius: 8, flexShrink: 0, border: '1px solid #f0f0f0' }}
                 />
-                <div style={{ flex: 1 }}>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', flexWrap: 'wrap' }}>
-                    <Text strong style={{ fontSize: 14, color: '#262626' }}>
+                <div style={{ flex: 1, minWidth: 0 }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', flexWrap: 'wrap', gap: 4 }}>
+                    <Text strong style={{ fontSize: 14, color: '#262626' }} ellipsis>
                       {item.productName}
                     </Text>
-                    <Text type="secondary" style={{ fontSize: 12 }}>
+                    <Text type="secondary" style={{ fontSize: 11 }}>
                       {item.date}
                     </Text>
                   </div>
 
                   <Paragraph
-                    ellipsis={{ rows: 1 }}
-                    style={{ margin: '8px 0 6px 0', color: '#595959', fontWeight: 500 }}
+                    ellipsis={{ rows: 2 }}
+                    style={{ margin: '6px 0', color: '#595959', fontWeight: 500, wordBreak: 'break-word' }}
                   >
                     "{item.question}"
                   </Paragraph>
@@ -227,7 +226,7 @@ const MyQuestions = () => {
                     )}
                   </div>
                 </div>
-                <RightOutlined style={{ color: '#bfbfbf', alignSelf: 'center', fontSize: 14 }} />
+                <RightOutlined style={{ color: '#bfbfbf', alignSelf: 'center', fontSize: 14, flexShrink: 0 }} />
               </div>
             </Card>
           ))}
@@ -236,7 +235,7 @@ const MyQuestions = () => {
 
       {/* Soru Detay Modalı */}
       <Modal
-        title={`Soru Talebi Detayı`}
+        title="Soru Talebi Detayı"
         open={!!selectedTicket}
         onCancel={() => setSelectedTicket(null)}
         zIndex={2000}
@@ -256,7 +255,7 @@ const MyQuestions = () => {
               <Text strong style={{ fontSize: 12, color: '#8c8c8c' }}>
                 Sizin Sorunuz ({selectedTicket.date}):
               </Text>
-              <p style={{ margin: '4px 0 0 0', fontWeight: 500 }}>{selectedTicket.question}</p>
+              <p style={{ margin: '4px 0 0 0', fontWeight: 500, wordBreak: 'break-word' }}>{selectedTicket.question}</p>
             </div>
 
             {selectedTicket.reply ? (
@@ -270,7 +269,7 @@ const MyQuestions = () => {
                 }}
               >
                 <Text strong style={{ fontSize: 12, color: '#52c41a' }}>Mağaza Yanıtı:</Text>
-                <p style={{ margin: '4px 0 0 0' }}>{selectedTicket.reply}</p>
+                <p style={{ margin: '4px 0 0 0', wordBreak: 'break-word' }}>{selectedTicket.reply}</p>
               </div>
             ) : (
               <div style={{ marginTop: 12 }}>
@@ -297,7 +296,7 @@ const MyQuestions = () => {
             label="Soru Sorulacak Ürün"
             rules={[{ required: true, message: 'Lütfen bir ürün seçin.' }]}
           >
-            <Select showSearch placeholder="Ürün adı yazarak arayın..." optionFilterProp="children">
+            <Select showSearch placeholder="Ürün adı yazarak arayın..." optionFilterProp="children" virtual={false}>
               {productsList.map((p) => (
                 <Option key={p.id} value={p.id}>
                   {p.name}

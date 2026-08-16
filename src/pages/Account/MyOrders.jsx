@@ -27,6 +27,7 @@ import {
   RightOutlined
 } from '@ant-design/icons';
 import { useAuth } from '../../context/AuthContext';
+import './responsive.css';
 
 const { Title, Text } = Typography;
 const { Option } = Select;
@@ -58,7 +59,6 @@ const MyOrders = () => {
   const [selectedYear, setSelectedYear] = useState(new Date().getFullYear().toString());
   const [selectedMonth, setSelectedMonth] = useState(new Date().getMonth() + 1);
 
-  // İade Modalı Durumları
   const [returnModalOpen, setReturnModalOpen] = useState(false);
   const [selectedReturnItem, setSelectedReturnItem] = useState(null);
 
@@ -99,14 +99,12 @@ const MyOrders = () => {
     fetchMonthlyOrders();
   }, [token, selectedYear, selectedMonth]);
 
-  // Ürün Detay Sayfasına Yönlendirme
   const handleProductClick = (productId) => {
     if (productId) {
       navigate(`/product/${productId}`);
     }
   };
 
-  // İade Talebi Gönderme
   const handleCreateReturn = async (values) => {
     if (!selectedReturnItem || !token) return;
 
@@ -163,7 +161,7 @@ const MyOrders = () => {
   };
 
   return (
-    <div>
+    <div style={{ maxWidth: '100%', overflowX: 'hidden' }}>
       {/* Üst Filtreleme Kartı */}
       <Card
         style={{
@@ -172,7 +170,7 @@ const MyOrders = () => {
           border: '1px solid #f0f0f0',
           boxShadow: '0 2px 8px rgba(0,0,0,0.03)'
         }}
-        styles={{ body: { padding: 20 } }}
+        styles={{ body: { padding: 16 } }}
       >
         <Row justify="space-between" align="middle" gutter={[16, 16]}>
           <Col xs={24} sm={12}>
@@ -183,13 +181,14 @@ const MyOrders = () => {
               Sipariş detaylarınızı görüntüleyin ve iade süreçlerinizi yönetin.
             </Text>
           </Col>
-          <Col xs={24} sm={12} style={{ textAlign: 'right' }}>
+          <Col xs={24} sm={12} className="mobile-text-left" style={{ textAlign: 'right' }}>
             <Space wrap>
               <CalendarOutlined style={{ color: '#8c8c8c' }} />
               <Select
                 value={selectedMonth}
                 onChange={setSelectedMonth}
-                style={{ width: 120, borderRadius: 8 }}
+                style={{ width: 110, borderRadius: 8 }}
+                virtual={false}
               >
                 {monthsList.map((m) => (
                   <Option key={m.value} value={m.value}>
@@ -200,7 +199,8 @@ const MyOrders = () => {
               <Select
                 value={selectedYear}
                 onChange={setSelectedYear}
-                style={{ width: 100, borderRadius: 8 }}
+                style={{ width: 90, borderRadius: 8 }}
+                virtual={false}
               >
                 <Option value="2026">2026</Option>
                 <Option value="2025">2025</Option>
@@ -230,15 +230,15 @@ const MyOrders = () => {
                 border: '1px solid #e8e8e8',
                 boxShadow: '0 2px 6px rgba(0,0,0,0.02)'
               }}
-              styles={{ body: { padding: 20 } }}
+              styles={{ body: { padding: 16 } }}
             >
               {/* Sipariş Başlığı */}
-              <Row justify="space-between" align="middle" style={{ marginBottom: 12 }}>
+              <Row justify="space-between" align="middle" gutter={[8, 8]} style={{ marginBottom: 12 }}>
                 <Col>
-                  <Space size={12}>
-                    <ShoppingOutlined style={{ fontSize: 20, color: '#1677ff' }} />
-                    <Text strong style={{ fontSize: 15 }}>
-                      Sipariş No: #{order.orderNumber}
+                  <Space size={8} wrap>
+                    <ShoppingOutlined style={{ fontSize: 18, color: '#1677ff' }} />
+                    <Text strong style={{ fontSize: 14 }}>
+                      #{order.orderNumber}
                     </Text>
                     <Text type="secondary" style={{ fontSize: 12 }}>
                       ({new Date(order.createdAt).toLocaleDateString('tr-TR')})
@@ -258,13 +258,14 @@ const MyOrders = () => {
                     marginBottom: 12,
                     display: 'flex',
                     alignItems: 'center',
-                    gap: 16,
+                    gap: 12,
+                    flexWrap: 'wrap',
                     fontSize: 12
                   }}
                 >
                   <Space>
                     <CarOutlined style={{ color: '#52c41a' }} />
-                    <Text type="secondary">Kargo Firması:</Text>
+                    <Text type="secondary">Kargo:</Text>
                     <Text strong>{order.cargoCompany}</Text>
                   </Space>
                   {order.trackingNumber && (
@@ -282,8 +283,7 @@ const MyOrders = () => {
               {/* Sipariş Kalemleri */}
               <Space direction="vertical" size={16} style={{ width: '100%' }}>
                 {order.items?.map((item) => (
-                  <Row key={item.id} justify="space-between" align="middle" style={{ width: '100%' }}>
-                    {/* Ürün Detayına Gitmek İçin Tıklanabilir Alan */}
+                  <Row key={item.id} justify="space-between" align="middle" gutter={[12, 12]} style={{ width: '100%' }}>
                     <Col xs={24} sm={15}>
                       <div
                         onClick={() => handleProductClick(item.id)}
@@ -292,25 +292,24 @@ const MyOrders = () => {
                           alignItems: 'center',
                           gap: 12,
                           cursor: 'pointer',
-                          padding: '4px 8px',
-                          borderRadius: 8,
-                          transition: 'background-color 0.2s'
+                          borderRadius: 8
                         }}
                       >
                         <Avatar
                           shape="square"
-                          size={54}
+                          size={48}
                           src={item.image}
                           style={{ borderRadius: 6, flexShrink: 0 }}
                         />
-                        <div>
+                        <div style={{ minWidth: 0, flex: 1 }}>
                           <Text
                             strong
                             style={{
-                              fontSize: 14,
+                              fontSize: 13,
                               display: 'block',
                               color: '#262626'
                             }}
+                            ellipsis
                           >
                             {item.name} <RightOutlined style={{ fontSize: 10, color: '#bfbfbf' }} />
                           </Text>
@@ -321,14 +320,12 @@ const MyOrders = () => {
                       </div>
                     </Col>
 
-                    {/* Fiyat ve İade Butonu */}
-                    <Col xs={24} sm={9} style={{ textAlign: 'right', marginTop: 8 }}>
-                      <Space direction="vertical" align="end" size={4}>
+                    <Col xs={24} sm={9} className="mobile-text-left" style={{ textAlign: 'right' }}>
+                      <Space direction="vertical" align="end" size={4} className="mobile-full-width">
                         <Text strong style={{ fontSize: 14 }}>
                           ₺{item.totalPrice.toLocaleString('tr-TR')}
                         </Text>
 
-                        {/* İade Durum Etiketi veya İade Talebi Oluştur Butonu */}
                         {item.returnStatus ? (
                           <Tag color="orange" style={{ borderRadius: 6 }}>
                             {item.returnStatus}
@@ -351,7 +348,7 @@ const MyOrders = () => {
                               }}
                               style={{ borderRadius: 6, fontSize: 12 }}
                             >
-                              İade Talebi Oluştur
+                              İade Talebi
                             </Button>
                           )
                         )}
@@ -363,7 +360,6 @@ const MyOrders = () => {
 
               <Divider style={{ margin: '12px 0' }} />
 
-              {/* Toplam Tutar */}
               <Row justify="end" align="middle">
                 <Text type="secondary" style={{ marginRight: 8, fontSize: 13 }}>
                   Toplam Tutar:
@@ -390,7 +386,7 @@ const MyOrders = () => {
           <Form
             form={form}
             layout="vertical"
-            onFinish={handleCreateReturn}
+            onFinish={handleCreateCreateReturn}
             style={{ marginTop: 16 }}
           >
             <div style={{ backgroundColor: '#fafafa', padding: 12, borderRadius: 8, marginBottom: 16 }}>
@@ -405,7 +401,7 @@ const MyOrders = () => {
               label="İade Nedeni"
               rules={[{ required: true, message: 'Lütfen bir iade nedeni seçin.' }]}
             >
-              <Select placeholder="İade nedenini seçiniz" style={{ borderRadius: 8 }}>
+              <Select placeholder="İade nedenini seçiniz" style={{ borderRadius: 8 }} virtual={false}>
                 <Option value="Ürün Hasarlı/Kusurlu">Ürün Hasarlı veya Kusurlu Geldi</Option>
                 <Option value="Yanlış Ürün Gönderildi">Yanlış Ürün Gönderildi</Option>
                 <Option value="Açıklama/Görsel ile Uyuşmuyor">Ürün Görseldeki ile Uyuşmuyor</Option>
