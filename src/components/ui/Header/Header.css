@@ -32,9 +32,35 @@
 .nav-menu a:hover { color: #888888; }
 .nav-menu i { font-size: 10px; color: #666666; }
 
-.logo { position: absolute; left: 50%; transform: translateX(-50%); text-align: center; display: flex; flex-direction: column; align-items: center; justify-content: center; line-height: 1; }
-.logo-small { font-size: 13px; letter-spacing: 6px; text-transform: lowercase; color: #555555; margin-bottom: -4px; font-weight: 500; }
-.logo-large { font-size: 36px; font-weight: 700; letter-spacing: -1.5px; color: #1a1a1a; }
+/* LOGO ALANI */
+.logo { 
+  position: absolute; 
+  left: 50%; 
+  transform: translateX(-50%); 
+  text-align: center; 
+  display: flex; 
+  flex-direction: column; 
+  align-items: center; 
+  justify-content: center; 
+  line-height: 1; 
+}
+
+.logo-small { 
+  font-size: 13px; 
+  font-weight: 700; 
+  letter-spacing: 8px; 
+  text-transform: lowercase; 
+  color: #1a1a1a; 
+  margin-bottom: 3px; 
+  margin-right: -8px; 
+}
+
+.logo-large { 
+  font-size: 36px; 
+  font-weight: 700; 
+  letter-spacing: -1.5px; 
+  color: #1a1a1a; 
+}
 
 .header-icons { display: flex; align-items: center; gap: 24px; }
 .icon-link { color: #1a1a1a; font-size: 22px; position: relative; transition: transform 0.2s ease; background: none; border: none; cursor: pointer; padding: 0; text-decoration: none; }
@@ -452,7 +478,10 @@
 
   .logo-small {
     font-size: 10px;
-    letter-spacing: 3px;
+    font-weight: 700;
+    letter-spacing: 5px;
+    margin-right: -5px;
+    margin-bottom: 2px;
   }
 
   .logo-large {
