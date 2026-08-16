@@ -75,6 +75,9 @@ export default function Dashboard() {
       console.error('Dashboard yükleme hatası:', error);
       if (error.response?.status === 401) {
         message.error('Oturum süreniz dolmuş. Lütfen tekrar giriş yapın.');
+        navigate('/login');
+      } else if (error.response?.status === 403) {
+        message.error('Bu panele erişim yetkiniz bulunmamaktadır (Admin yetkisi gerekli).');
       } else {
         message.error('Dashboard verileri yüklenirken bir hata oluştu.');
       }
