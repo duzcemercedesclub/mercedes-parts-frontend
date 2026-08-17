@@ -155,7 +155,7 @@ const Header = () => {
         className="main-header"
         style={
           isSticky 
-            ? { position: 'fixed', top: 0, width: '100%', zIndex: 1050, boxShadow: '0 4px 12px rgba(0,0,0,0.05)' }
+            ? { position: 'fixed', top: 0, width: '100%', zIndex: 1050, boxShadow: '0 4px 12px rgba(0,0,0,0.1)' }
             : { position: 'relative', zIndex: 1050 }
         }
       >
@@ -262,6 +262,14 @@ const Header = () => {
           </Link>
         </div>
       </div>
+
+      {/* MOBİL MENÜ AÇIKKEN ARKA PLANI KARARTAN MASK EKRANI */}
+      {isMobileMenuOpen && (
+        <div 
+          className="mobile-nav-overlay" 
+          onClick={() => setIsMobileMenuOpen(false)}
+        />
+      )}
 
       {/* ARAMA MODAL / OVERLAY PENCERESİ */}
       {isSearchOpen && (
