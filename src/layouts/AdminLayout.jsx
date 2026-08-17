@@ -18,7 +18,8 @@ import {
   SettingOutlined,
   LogoutOutlined,
   GlobalOutlined,
-  TrademarkOutlined
+  TrademarkOutlined,
+  TagsOutlined
 } from '@ant-design/icons';
 
 const { Header, Sider, Content } = Layout;
@@ -150,6 +151,14 @@ const AdminLayout = () => {
       label: 'Sipariş Yönetimi',
       children: [
         { key: '/admin/orders', label: 'Sipariş Listesi' },
+      ],
+    },
+    {
+      key: 'coupon-group',
+      icon: <TagsOutlined />,
+      label: 'Kupon Yönetimi',
+      children: [
+        { key: '/admin/coupon', label: 'Kupon Listesi' },
       ],
     },
     {

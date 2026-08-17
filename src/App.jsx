@@ -56,6 +56,9 @@ import UserList from "./pages/admin/User/UserList";
 
 import OrdersList from './pages/admin/Orders/OrdersList';
 
+import Coupons from './pages/admin/Coupon/AdminCouponManager';
+
+
 import GeneralAndLogoSettings from "./pages/admin/Settings/GeneralAndLogoSettings";
 import SocialMediaManager from "./pages/admin/Settings/SocialMediaManager";
 import SmtpSettings from "./pages/admin/Settings/SmtpSettings";
@@ -160,6 +163,9 @@ const App = () => {
           <Route path="users" element={<UserList />} />
 
           <Route path="orders" element={<OrdersList />} />
+
+          <Route path="coupon" element={<Coupons />} />
+
 
           {/* AYARLAR YÖNETİMİ MODÜLÜ */}
           <Route path="settings/general" element={<GeneralAndLogoSettings />} />
