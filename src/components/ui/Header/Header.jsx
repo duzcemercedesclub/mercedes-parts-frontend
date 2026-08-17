@@ -12,7 +12,7 @@ const Header = () => {
 
   const { user, logout } = useAuth();
 
-  // Arama State'leri
+  // ARAMA STATE'LERİ
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [searchResults, setSearchResults] = useState([]);
@@ -170,7 +170,7 @@ const Header = () => {
           <i className={isMobileMenuOpen ? "fas fa-times" : "fas fa-bars"}></i>
         </button>
 
-        {/* GEZİNTİ MENÜSÜ (ANASAYFA, MAĞAZA, İLETİŞİM) */}
+        {/* NAVİGASYON MENÜSÜ */}
         <nav className={`nav-menu ${isMobileMenuOpen ? 'mobile-active' : ''}`}>
           <ul>
             <li><Link to="/" onClick={() => setIsMobileMenuOpen(false)}>Anasayfa</Link></li>
@@ -179,7 +179,7 @@ const Header = () => {
           </ul>
         </nav>
 
-        {/* LOGO */}
+        {/* DİNAMİK LOGO */}
         <div className="logo">
           {settings.use_image_logo === 1 && settings.logo_url ? (
             <Link to="/" onClick={() => setIsMobileMenuOpen(false)}>
@@ -197,10 +197,10 @@ const Header = () => {
           )}
         </div>
 
-        {/* İKONLAR GRUBU (ARAMA, HESABIM, FAVORİLER, SEPET) */}
+        {/* SAĞ İKONLAR GRUBU */}
         <div className="header-icons">
           
-          {/* ARAMA */}
+          {/* ARAMA İKONU */}
           <button 
             type="button" 
             className="icon-link"
@@ -266,7 +266,7 @@ const Header = () => {
         </div>
       </div>
 
-      {/* ARAMA MODAL / OVERLAY PENCERESİ */}
+      {/* ARAMA MODAL/OVERLAY */}
       {isSearchOpen && (
         <div className="search-overlay" onClick={() => setIsSearchOpen(false)}>
           <div className="search-modal" onClick={(e) => e.stopPropagation()}>
