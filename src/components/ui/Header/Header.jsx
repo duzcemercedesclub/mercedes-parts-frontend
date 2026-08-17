@@ -8,7 +8,7 @@ import './Header.css';
 const Header = () => {
   const [isSticky, setIsSticky] = useState(false);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
-  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false); // Mobil menü durumu
 
   const { user, logout } = useAuth();
 
@@ -85,7 +85,7 @@ const Header = () => {
           const products = Array.isArray(response.data) ? response.data : (response.data.products || []);
           setSearchResults(products.slice(0, 5));
         } catch (error) {
-          console.error("Arama hatası:", error);
+          console.error("Arama yapılırken hata oluştu:", error);
         } finally {
           setIsSearching(false);
         }
@@ -122,7 +122,7 @@ const Header = () => {
   return (
     <header className="header">
       
-      {/* ÜST BAR */}
+      {/* ÜST BAR (TOP BAR) */}
       <div className="top-bar">
         <div className="social-icons">
           {settings.show_facebook === 1 && (
@@ -151,18 +151,16 @@ const Header = () => {
         </div>
       </div>
 
-      {/* ANA HEADER */}
       <div 
         className="main-header"
         style={
           isSticky 
-            ? { position: 'fixed', top: 0, width: '100%', zIndex: 1050, boxShadow: '0 4px 12px rgba(0,0,0,0.08)' }
+            ? { position: 'fixed', top: 0, width: '100%', zIndex: 1050, boxShadow: '0 4px 12px rgba(0,0,0,0.05)' }
             : { position: 'relative', zIndex: 1050 }
         }
       >
         {/* MOBİL HAMBURGER BUTONU */}
         <button 
-          type="button"
           className="mobile-menu-toggle" 
           onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
           aria-label="Menüyü Aç/Kapat"
@@ -179,7 +177,7 @@ const Header = () => {
           </ul>
         </nav>
 
-        {/* DİNAMİK LOGO */}
+        {/* DİNAMİK LOGO ALANI */}
         <div className="logo">
           {settings.use_image_logo === 1 && settings.logo_url ? (
             <Link to="/" onClick={() => setIsMobileMenuOpen(false)}>
@@ -197,13 +195,12 @@ const Header = () => {
           )}
         </div>
 
-        {/* SAĞ İKONLAR GRUBU */}
         <div className="header-icons">
           
-          {/* ARAMA İKONU */}
+          {/* ARAMA TETİKLEYİCİ BUTON */}
           <button 
             type="button" 
-            className="icon-link"
+            className="icon-link search-toggle-btn"
             onClick={() => {
               setIsSearchOpen(!isSearchOpen);
               setIsMobileMenuOpen(false);
@@ -213,7 +210,7 @@ const Header = () => {
             <i className="fas fa-search"></i>
           </button>
           
-          {/* HESABIM DROPDOWN */}
+          {/* HESABIM DROPDOWN ALANI */}
           {user ? (
             <div 
               className="account-menu-wrapper"
@@ -222,7 +219,7 @@ const Header = () => {
               onMouseLeave={() => setIsDropdownOpen(false)}
             >
               <div className={`account-trigger-box ${isDropdownOpen ? 'active' : ''}`}>
-                <i className="fas fa-user account-box-icon"></i>
+                <i className="far fa-user account-box-icon"></i>
                 <div className="account-text-group">
                   <span className="account-title-text">Hesabım</span>
                   <span className="account-user-name">{user.name ? user.name.toUpperCase() : ''}</span>
@@ -246,27 +243,26 @@ const Header = () => {
               )}
             </div>
           ) : (
-            <Link to="/login" className="icon-link" title="Giriş Yap" onClick={() => setIsMobileMenuOpen(false)}>
-              <i className="fas fa-user"></i>
+            <Link to="/login" className="icon-link" onClick={() => setIsMobileMenuOpen(false)}>
+              <i className="far fa-user"></i>
             </Link>
           )}
 
-          {/* FAVORİLER (WISHLIST) */}
-          <Link to="/wishlist" className="icon-link wishlist-icon" title="Favorilerim" onClick={() => setIsMobileMenuOpen(false)}>
-            <i className="fas fa-heart"></i>
+          {/* WISHLIST (FAVORİLER) ALANI */}
+          <Link to="/wishlist" className="icon-link wishlist-icon" onClick={() => setIsMobileMenuOpen(false)}>
+            <i className="far fa-heart"></i>
             {totalWishlistItems > 0 && <span className="badge">{totalWishlistItems}</span>}
           </Link>
 
-          {/* SEPET (CART) */}
-          <Link to="/cart" className="icon-link wishlist-icon" title="Sepetim" onClick={() => setIsMobileMenuOpen(false)}>
-            <i className="fas fa-shopping-cart"></i>
+          {/* SEPET ALANI */}
+          <Link to="/cart" className="icon-link wishlist-icon" onClick={() => setIsMobileMenuOpen(false)}>
+            <i className="fas fa-basket-shopping"></i>
             {totalCartItems > 0 && <span className="badge">{totalCartItems}</span>}
           </Link>
-
         </div>
       </div>
 
-      {/* ARAMA MODAL/OVERLAY */}
+      {/* ARAMA MODAL / OVERLAY PENCERESİ */}
       {isSearchOpen && (
         <div className="search-overlay" onClick={() => setIsSearchOpen(false)}>
           <div className="search-modal" onClick={(e) => e.stopPropagation()}>
@@ -296,23 +292,24 @@ const Header = () => {
                 onClick={() => setIsSearchOpen(false)}
                 title="Kapat"
               >
-                <i className="fas fa-times"></i>
+                <i className="fas fa-xmark"></i>
               </button>
             </form>
 
-            {/* CANLI ARAMA SONUÇLARI */}
+            {/* CANLI ARAMA SONUÇLARI DROPDOWN */}
             {searchQuery.trim().length >= 2 && (
               <div className="search-results-dropdown">
                 {isSearching ? (
                   <div className="search-loading">
-                    <i className="fas fa-spinner fa-spin"></i> Arandıyor...
+                    <i className="fas fa-spinner fa-spin"></i> Ürünler aranıyor...
                   </div>
                 ) : searchResults.length > 0 ? (
                   <div className="search-results-list">
                     {searchResults.map((product) => {
+                      const discountRate = Number(product.discount_rate || 0);
                       const origPrice = Number(product.price || 0);
                       const salePrice = Number(product.sale_price || origPrice);
-                      const hasDiscount = salePrice < origPrice;
+                      const hasDiscount = discountRate > 0 || (product.sale_price && salePrice < origPrice);
 
                       return (
                         <Link
