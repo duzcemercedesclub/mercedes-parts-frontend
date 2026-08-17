@@ -8,7 +8,7 @@ import './Header.css';
 const Header = () => {
   const [isSticky, setIsSticky] = useState(false);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
-  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false); // Mobil menü durumu
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   const { user, logout } = useAuth();
 
@@ -161,6 +161,7 @@ const Header = () => {
       >
         {/* MOBİL HAMBURGER BUTONU */}
         <button 
+          type="button"
           className="mobile-menu-toggle" 
           onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
           aria-label="Menüyü Aç/Kapat"
