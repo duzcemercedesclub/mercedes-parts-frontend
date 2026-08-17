@@ -85,7 +85,7 @@ const Header = () => {
           const products = Array.isArray(response.data) ? response.data : (response.data.products || []);
           setSearchResults(products.slice(0, 5));
         } catch (error) {
-          console.error("Arama yapılırken hata oluştu:", error);
+          console.error("Arama hatası:", error);
         } finally {
           setIsSearching(false);
         }
@@ -122,7 +122,7 @@ const Header = () => {
   return (
     <header className="header">
       
-      {/* ÜST BAR (TOP BAR) */}
+      {/* ÜST BAR */}
       <div className="top-bar">
         <div className="social-icons">
           {settings.show_facebook === 1 && (
@@ -151,11 +151,12 @@ const Header = () => {
         </div>
       </div>
 
+      {/* ANA HEADER */}
       <div 
         className="main-header"
         style={
           isSticky 
-            ? { position: 'fixed', top: 0, width: '100%', zIndex: 1050, boxShadow: '0 4px 12px rgba(0,0,0,0.05)' }
+            ? { position: 'fixed', top: 0, width: '100%', zIndex: 1050, boxShadow: '0 4px 12px rgba(0,0,0,0.08)' }
             : { position: 'relative', zIndex: 1050 }
         }
       >
@@ -178,7 +179,7 @@ const Header = () => {
           </ul>
         </nav>
 
-        {/* DİNAMİK LOGO ALANI */}
+        {/* DİNAMİK LOGO */}
         <div className="logo">
           {settings.use_image_logo === 1 && settings.logo_url ? (
             <Link to="/" onClick={() => setIsMobileMenuOpen(false)}>
@@ -196,12 +197,13 @@ const Header = () => {
           )}
         </div>
 
+        {/* SAĞ İKONLAR GRUBU */}
         <div className="header-icons">
           
-          {/* ARAMA TETİKLEYİCİ BUTON */}
+          {/* ARAMA İKONU */}
           <button 
             type="button" 
-            className="icon-link search-toggle-btn"
+            className="icon-link"
             onClick={() => {
               setIsSearchOpen(!isSearchOpen);
               setIsMobileMenuOpen(false);
@@ -211,7 +213,7 @@ const Header = () => {
             <i className="fas fa-search"></i>
           </button>
           
-          {/* HESABIM DROPDOWN ALANI */}
+          {/* HESABIM DROPDOWN */}
           {user ? (
             <div 
               className="account-menu-wrapper"
@@ -220,7 +222,7 @@ const Header = () => {
               onMouseLeave={() => setIsDropdownOpen(false)}
             >
               <div className={`account-trigger-box ${isDropdownOpen ? 'active' : ''}`}>
-                <i className="far fa-user account-box-icon"></i>
+                <i className="fas fa-user account-box-icon"></i>
                 <div className="account-text-group">
                   <span className="account-title-text">Hesabım</span>
                   <span className="account-user-name">{user.name ? user.name.toUpperCase() : ''}</span>
@@ -244,26 +246,27 @@ const Header = () => {
               )}
             </div>
           ) : (
-            <Link to="/login" className="icon-link" onClick={() => setIsMobileMenuOpen(false)}>
-              <i className="far fa-user"></i>
+            <Link to="/login" className="icon-link" title="Giriş Yap" onClick={() => setIsMobileMenuOpen(false)}>
+              <i className="fas fa-user"></i>
             </Link>
           )}
 
-          {/* WISHLIST (FAVORİLER) ALANI */}
-          <Link to="/wishlist" className="icon-link wishlist-icon" onClick={() => setIsMobileMenuOpen(false)}>
-            <i className="far fa-heart"></i>
+          {/* FAVORİLER (WISHLIST) */}
+          <Link to="/wishlist" className="icon-link wishlist-icon" title="Favorilerim" onClick={() => setIsMobileMenuOpen(false)}>
+            <i className="fas fa-heart"></i>
             {totalWishlistItems > 0 && <span className="badge">{totalWishlistItems}</span>}
           </Link>
 
-          {/* SEPET ALANI */}
-          <Link to="/cart" className="icon-link wishlist-icon" onClick={() => setIsMobileMenuOpen(false)}>
-            <i className="fas fa-basket-shopping"></i>
+          {/* SEPET (CART) */}
+          <Link to="/cart" className="icon-link wishlist-icon" title="Sepetim" onClick={() => setIsMobileMenuOpen(false)}>
+            <i className="fas fa-shopping-cart"></i>
             {totalCartItems > 0 && <span className="badge">{totalCartItems}</span>}
           </Link>
+
         </div>
       </div>
 
-      {/* ARAMA MODAL / OVERLAY PENCERESİ */}
+      {/* ARAMA MODAL/OVERLAY */}
       {isSearchOpen && (
         <div className="search-overlay" onClick={() => setIsSearchOpen(false)}>
           <div className="search-modal" onClick={(e) => e.stopPropagation()}>
@@ -293,24 +296,23 @@ const Header = () => {
                 onClick={() => setIsSearchOpen(false)}
                 title="Kapat"
               >
-                <i className="fas fa-xmark"></i>
+                <i className="fas fa-times"></i>
               </button>
             </form>
 
-            {/* CANLI ARAMA SONUÇLARI DROPDOWN */}
+            {/* CANLI ARAMA SONUÇLARI */}
             {searchQuery.trim().length >= 2 && (
               <div className="search-results-dropdown">
                 {isSearching ? (
                   <div className="search-loading">
-                    <i className="fas fa-spinner fa-spin"></i> Ürünler aranıyor...
+                    <i className="fas fa-spinner fa-spin"></i> Arandıyor...
                   </div>
                 ) : searchResults.length > 0 ? (
                   <div className="search-results-list">
                     {searchResults.map((product) => {
-                      const discountRate = Number(product.discount_rate || 0);
                       const origPrice = Number(product.price || 0);
                       const salePrice = Number(product.sale_price || origPrice);
-                      const hasDiscount = discountRate > 0 || (product.sale_price && salePrice < origPrice);
+                      const hasDiscount = salePrice < origPrice;
 
                       return (
                         <Link
@@ -363,9 +365,7 @@ const Header = () => {
         </div>
       )}
 
-
     </header>
-
   );
 };
 
