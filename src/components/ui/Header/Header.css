@@ -1,3 +1,6 @@
+/* ==========================================================================
+   ÜST BAR (TOP BAR)
+   ========================================================================== */
 .top-bar { 
   background-color: #1e1e1e; 
   color: #ffffff; 
@@ -7,28 +10,61 @@
   padding: 10px 40px; 
   font-size: 14px; 
 }
-.social-icons a { color: #ffffff; margin-right: 18px; font-size: 15px; transition: opacity 0.3s ease; }
+
+.social-icons a { 
+  color: #ffffff; 
+  margin-right: 18px; 
+  font-size: 15px; 
+  transition: opacity 0.3s ease; 
+}
 .social-icons a:hover { opacity: 0.7; }
-.promo-text { color: #b3b3b3; letter-spacing: 0.5px; }
-.promo-text .highlight { color: #ffffff; text-decoration: underline; text-underline-offset: 4px; font-weight: 600; margin-left: 5px; }
+
+.promo-text { 
+  color: #b3b3b3; 
+  letter-spacing: 0.5px; 
+}
+
 .currency-selector { cursor: pointer; }
 .currency-selector span { display: flex; align-items: center; gap: 6px; font-weight: 500; }
 .currency-selector i { font-size: 10px; }
 
+/* ==========================================================================
+   ANA HEADER VE GEZİNTİ MENÜSÜ
+   ========================================================================== */
 .main-header { 
   background-color: #ffffff; 
   display: flex; 
   justify-content: space-between; 
   align-items: center; 
-  padding: 20px 40px; 
+  padding: 18px 40px; 
   border-bottom: 1px solid #f0f0f0; 
   position: relative; 
   z-index: 1050; 
   transition: all 0.3s ease; 
 }
 
-.nav-menu ul { display: flex; gap: 30px; list-style: none; margin: 0; padding: 0; }
-.nav-menu a { color: #333333; font-size: 15px; font-weight: 500; display: flex; align-items: center; gap: 6px; transition: color 0.3s ease; text-decoration: none; }
+.nav-menu {
+  display: block;
+}
+
+.nav-menu ul { 
+  display: flex; 
+  gap: 30px; 
+  list-style: none; 
+  margin: 0; 
+  padding: 0; 
+}
+
+.nav-menu a { 
+  color: #333333; 
+  font-size: 15px; 
+  font-weight: 500; 
+  display: flex; 
+  align-items: center; 
+  gap: 6px; 
+  transition: color 0.3s ease; 
+  text-decoration: none; 
+}
 .nav-menu a:hover { color: #888888; }
 .nav-menu i { font-size: 10px; color: #666666; }
 
@@ -61,11 +97,13 @@
   color: #1a1a1a; 
 }
 
-/* SAĞ İKONLAR (ARAMA, HESABIM, FAVORİ, SEPET) */
+/* ==========================================================================
+   SAĞ İKONLAR (ARAMA, HESABIM, FAVORİ, SEPET)
+   ========================================================================== */
 .header-icons { 
   display: flex !important; 
   align-items: center; 
-  gap: 20px; 
+  gap: 22px; 
   flex-shrink: 0;
   z-index: 1060;
 }
@@ -80,7 +118,7 @@
   cursor: pointer; 
   padding: 4px; 
   text-decoration: none;
-  display: inline-flex;
+  display: inline-flex !important;
   align-items: center;
   justify-content: center;
   line-height: 1;
@@ -93,7 +131,7 @@
 
 .wishlist-icon { 
   position: relative; 
-  display: inline-flex; 
+  display: inline-flex !important; 
   align-items: center; 
   text-decoration: none; 
 }
@@ -115,7 +153,7 @@
   border: 2px solid #ffffff; 
 }
 
-/* HAMBURGER MOBİL MENÜ BUTONU */
+/* HAMBURGER BUTONU */
 .mobile-menu-toggle {
   display: none;
   background: none;
@@ -261,7 +299,9 @@
   to { opacity: 1; transform: translateY(0); }
 }
 
-/* ARAMA MODALI */
+/* ==========================================================================
+   ARAMA MODALI
+   ========================================================================== */
 .search-overlay {
   position: fixed;
   top: 0;
@@ -447,7 +487,9 @@
   to { opacity: 1; transform: translateY(0); }
 }
 
-/* RESPONSIVE DÜZENLEMELER */
+/* ==========================================================================
+   RESPONSIVE DÜZENLEMELER
+   ========================================================================== */
 @media (max-width: 992px) {
   .top-bar {
     padding: 8px 16px;
