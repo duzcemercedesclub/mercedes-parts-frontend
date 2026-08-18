@@ -11,6 +11,9 @@ const CheckoutSuccess = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
+  // API BASE URL TANIMLAMASI
+  const apiUrl = import.meta.env.VITE_API_BASE_URL || import.meta.env.VITE_API_URL || 'https://mercedes-parts-backend.onrender.com';
+
   useEffect(() => {
     const confirmOrder = async () => {
       if (!sessionId) {
@@ -19,7 +22,7 @@ const CheckoutSuccess = () => {
       }
 
       try {
-        const response = await fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:5000'}/api/checkout/confirm-order`, {
+        const response = await fetch(`${apiUrl}/api/checkout/confirm-order`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
@@ -45,7 +48,7 @@ const CheckoutSuccess = () => {
     };
 
     confirmOrder();
-  }, [sessionId]);
+  }, [sessionId, apiUrl]);
 
   if (loading) {
     return (
