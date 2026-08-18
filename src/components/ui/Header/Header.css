@@ -1,3 +1,6 @@
+/* ==========================================================================
+   GENEL TOP BAR DÜZENLEMELERİ
+   ========================================================================== */
 .top-bar { 
   background-color: #1e1e1e; 
   color: #ffffff; 
@@ -15,6 +18,9 @@
 .currency-selector span { display: flex; align-items: center; gap: 6px; font-weight: 500; }
 .currency-selector i { font-size: 10px; }
 
+/* ==========================================================================
+   MAIN HEADER & NAVIGASYON (MASAÜSTÜ VARSAYILAN)
+   ========================================================================== */
 .main-header { 
   background-color: #ffffff; 
   display: flex; 
@@ -27,10 +33,39 @@
   transition: all 0.3s ease; 
 }
 
-.nav-menu ul { display: flex; gap: 30px; list-style: none; margin: 0; padding: 0; }
-.nav-menu a { color: #333333; font-size: 15px; font-weight: 500; display: flex; align-items: center; gap: 6px; transition: color 0.3s ease; text-decoration: none; }
-.nav-menu a:hover { color: #888888; }
-.nav-menu i { font-size: 10px; color: #666666; }
+/* MASAÜSTÜ MENÜ GÖRÜNÜR HALE GETİRİLDİ */
+.nav-menu {
+  display: flex;
+  align-items: center;
+}
+
+.nav-menu ul { 
+  display: flex; 
+  gap: 30px; 
+  list-style: none; 
+  margin: 0; 
+  padding: 0; 
+}
+
+.nav-menu a { 
+  color: #333333; 
+  font-size: 15px; 
+  font-weight: 500; 
+  display: flex; 
+  align-items: center; 
+  gap: 6px; 
+  transition: color 0.3s ease; 
+  text-decoration: none; 
+}
+
+.nav-menu a:hover { 
+  color: #888888; 
+}
+
+.nav-menu i { 
+  font-size: 10px; 
+  color: #666666; 
+}
 
 /* LOGO ALANI */
 .logo { 
@@ -67,7 +102,7 @@
 .wishlist-icon { position: relative; display: flex; align-items: center; text-decoration: none; }
 .badge { position: absolute; top: -6px; right: -8px; background-color: #3f4756; color: #ffffff; font-size: 11px; font-weight: 600; width: 18px; height: 18px; border-radius: 50%; display: flex; justify-content: center; align-items: center; border: 2px solid #ffffff; }
 
-/* HAMBURGER MOBİL MENÜ BUTONU */
+/* HAMBURGER MOBİL MENÜ BUTONU (MASAÜSTÜNDE GİZLİ) */
 .mobile-menu-toggle {
   display: none;
   background: none;
@@ -227,7 +262,7 @@
 }
 
 /* ==========================================================================
-   ARAMA MODAL VEYA CANLI ARAMA ALANI
+   ARAMA OVERLAY / MODAL
    ========================================================================== */
 .search-overlay {
   position: fixed;
@@ -329,7 +364,6 @@
   color: #0f172a;
 }
 
-/* CANLI ARAMA SONUÇLARI DROPDOWN */
 .search-results-dropdown {
   max-height: 420px;
   overflow-y: auto;
@@ -443,7 +477,7 @@
 }
 
 /* ==========================================================================
-   MOBİL & TABLET RESPONSIVE DÜZENLEMELERİ
+   MOBİL & TABLET RESPONSIVE DÜZENLEMELERİ (MAX-WIDTH: 992PX)
    ========================================================================== */
 @media (max-width: 992px) {
   .top-bar {
@@ -464,12 +498,11 @@
     padding: 12px 16px;
   }
 
-  /* Hamburger Menü Butonunu Göster */
+  /* Mobil Hamburger Butonu Görünür Yapılır */
   .mobile-menu-toggle {
     display: flex;
   }
 
-  /* Logo Pozisyonlamasını Mobilde Düzelt */
   .logo {
     position: static;
     transform: none;
@@ -488,7 +521,7 @@
     letter-spacing: -0.5px;
   }
 
-  /* Navigasyon Menüsünü Mobilde Açılır Penceremize Dönüştür */
+  /* MOBİL MENÜ DÜZENİ */
   .nav-menu {
     position: absolute;
     top: 100%;
@@ -497,12 +530,12 @@
     background-color: #ffffff;
     box-shadow: 0 10px 15px rgba(0, 0, 0, 0.1);
     border-top: 1px solid #f0f0f0;
-    display: none;
+    display: none; /* Mobilde kapalıyken gizli */
     padding: 16px 20px;
   }
 
   .nav-menu.mobile-active {
-    display: block;
+    display: block; /* Hamburger tıklanınca açılır */
   }
 
   .nav-menu ul {
@@ -515,7 +548,6 @@
     padding: 6px 0;
   }
 
-  /* İkonlar ve Hesabım Butonu Mobilde Sıkıştırma */
   .header-icons {
     gap: 12px;
   }
