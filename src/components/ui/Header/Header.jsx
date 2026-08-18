@@ -8,10 +8,11 @@ import './Header.css';
 const Header = () => {
   const [isSticky, setIsSticky] = useState(false);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
-  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false); // Mobil menü durumu
 
   const { user, logout } = useAuth();
 
+  // ARAMA STATE'LERİ
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [searchResults, setSearchResults] = useState([]);
@@ -154,7 +155,7 @@ const Header = () => {
         className="main-header"
         style={
           isSticky 
-            ? { position: 'fixed', top: 0, left: 0, width: '100%', zIndex: 1050, boxShadow: '0 4px 12px rgba(0,0,0,0.05)' }
+            ? { position: 'fixed', top: 0, width: '100%', zIndex: 1050, boxShadow: '0 4px 12px rgba(0,0,0,0.05)' }
             : { position: 'relative', zIndex: 1050 }
         }
       >
@@ -195,6 +196,8 @@ const Header = () => {
         </div>
 
         <div className="header-icons">
+          
+          {/* ARAMA TETİKLEYİCİ BUTON */}
           <button 
             type="button" 
             className="icon-link search-toggle-btn"
@@ -207,6 +210,7 @@ const Header = () => {
             <i className="fas fa-search"></i>
           </button>
           
+          {/* HESABIM DROPDOWN ALANI */}
           {user ? (
             <div 
               className="account-menu-wrapper"
@@ -244,11 +248,13 @@ const Header = () => {
             </Link>
           )}
 
+          {/* WISHLIST (FAVORİLER) ALANI */}
           <Link to="/wishlist" className="icon-link wishlist-icon" onClick={() => setIsMobileMenuOpen(false)}>
             <i className="far fa-heart"></i>
             {totalWishlistItems > 0 && <span className="badge">{totalWishlistItems}</span>}
           </Link>
 
+          {/* SEPET ALANI */}
           <Link to="/cart" className="icon-link wishlist-icon" onClick={() => setIsMobileMenuOpen(false)}>
             <i className="fas fa-basket-shopping"></i>
             {totalCartItems > 0 && <span className="badge">{totalCartItems}</span>}
@@ -256,7 +262,7 @@ const Header = () => {
         </div>
       </div>
 
-      {/* ARAMA MODAL */}
+      {/* ARAMA MODAL / OVERLAY PENCERESİ */}
       {isSearchOpen && (
         <div className="search-overlay" onClick={() => setIsSearchOpen(false)}>
           <div className="search-modal" onClick={(e) => e.stopPropagation()}>
@@ -290,6 +296,7 @@ const Header = () => {
               </button>
             </form>
 
+            {/* CANLI ARAMA SONUÇLARI DROPDOWN */}
             {searchQuery.trim().length >= 2 && (
               <div className="search-results-dropdown">
                 {isSearching ? (
