@@ -253,3 +253,42 @@
     cursor: pointer;
     line-height: 1;
 }
+/* Sayfalama (Pagination) Stilleri */
+.pagination {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 8px;
+    margin-top: 40px;
+    padding-top: 20px;
+    border-top: 1px solid #eaeaea;
+}
+
+.pagination-btn {
+    padding: 8px 14px;
+    border: 1px solid #eaeaea;
+    background-color: #ffffff;
+    color: #333;
+    font-size: 14px;
+    font-weight: 500;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.pagination-btn:hover:not(:disabled) {
+    background-color: #2b4c7e;
+    color: #ffffff;
+    border-color: #2b4c7e;
+}
+
+.pagination-btn.active {
+    background-color: #2b4c7e;
+    color: #ffffff;
+    border-color: #2b4c7e;
+}
+
+.pagination-btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
