@@ -16,6 +16,7 @@ import {
   Modal,
   Form,
   Input,
+  Popconfirm,
   message
 } from 'antd';
 import {
@@ -24,6 +25,7 @@ import {
   CarOutlined,
   BarcodeOutlined,
   RollbackOutlined,
+  CloseCircleOutlined,
   RightOutlined
 } from '@ant-design/icons';
 import { useAuth } from '../../context/AuthContext';
@@ -54,6 +56,7 @@ const MyOrders = () => {
 
   const [loading, setLoading] = useState(false);
   const [submittingReturn, setSubmittingReturn] = useState(false);
+  const [cancellingOrder, setCancellingOrder] = useState(false);
   const [orders, setOrders] = useState([]);
 
   const [selectedYear, setSelectedYear] = useState(new Date().getFullYear().toString());
@@ -105,6 +108,34 @@ const MyOrders = () => {
     }
   };
 
+  // Siparişi İptal Etme (Kargo öncesi durumlar)
+  const handleCancelOrder = async (orderId) => {
+    setCancellingOrder(true);
+    try {
+      const response = await fetch(`${API_URL}/api/orders/${orderId}/cancel`, {
+        method: 'PATCH',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`
+        }
+      });
+
+      const data = await response.json();
+      if (response.ok) {
+        message.success(data.message || 'Siparişiniz başarıyla iptal edildi.');
+        fetchMonthlyOrders();
+      } else {
+        message.error(data.error || 'Sipariş iptal edilemedi.');
+      }
+    } catch (error) {
+      console.error('İptal hatası:', error);
+      message.error('Sipariş iptal edilirken bir hata oluştu.');
+    } finally {
+      setCancellingOrder(false);
+    }
+  };
+
+  // İade Talebi Gönderme
   const handleCreateReturn = async (values) => {
     if (!selectedReturnItem || !token) return;
 
@@ -155,14 +186,17 @@ const MyOrders = () => {
         return <Tag color="processing">Kargoya Verildi</Tag>;
       case 'İptal Edildi':
         return <Tag color="error">İptal Edildi</Tag>;
+      case 'İade Talebi Oluşturuldu':
+        return <Tag color="warning">İade Talebi Alındı</Tag>;
+      case 'İade Onaylandı (Para İadesi Yapıldı)':
+        return <Tag color="magenta">Para İadesi Yapıldı</Tag>;
       default:
-        return <Tag color="warning">{status || 'Hazırlanıyor'}</Tag>;
+        return <Tag color="warning">{status || 'Ödeme Yapıldı'}</Tag>;
     }
   };
 
   return (
     <div style={{ maxWidth: '100%', overflowX: 'hidden' }}>
-      {/* Üst Filtreleme Kartı */}
       <Card
         style={{
           borderRadius: 16,
@@ -178,7 +212,7 @@ const MyOrders = () => {
               Siparişlerim
             </Title>
             <Text type="secondary" style={{ fontSize: 13 }}>
-              Sipariş detaylarınızı görüntüleyin ve iade süreçlerinizi yönetin.
+              Sipariş detaylarınızı görüntüleyin ve iade/iptal süreçlerinizi yönetin.
             </Text>
           </Col>
           <Col xs={24} sm={12} className="mobile-text-left" style={{ textAlign: 'right' }}>
@@ -211,10 +245,9 @@ const MyOrders = () => {
         </Row>
       </Card>
 
-      {/* Sipariş Listesi */}
       {loading ? (
         <div style={{ textAlign: 'center', padding: '60px 0' }}>
-          <Spin size="large" description="Siparişleriniz yükleniyor..." />
+          <Spin size="large" tip="Siparişleriniz yükleniyor..." />
         </div>
       ) : orders.length === 0 ? (
         <Card style={{ borderRadius: 12, textAlign: 'center', padding: '40px 0' }}>
@@ -222,154 +255,176 @@ const MyOrders = () => {
         </Card>
       ) : (
         <Space direction="vertical" size={16} style={{ width: '100%' }}>
-          {orders.map((order) => (
-            <Card
-              key={order.id}
-              style={{
-                borderRadius: 12,
-                border: '1px solid #e8e8e8',
-                boxShadow: '0 2px 6px rgba(0,0,0,0.02)'
-              }}
-              styles={{ body: { padding: 16 } }}
-            >
-              {/* Sipariş Başlığı */}
-              <Row justify="space-between" align="middle" gutter={[8, 8]} style={{ marginBottom: 12 }}>
-                <Col>
-                  <Space size={8} wrap>
-                    <ShoppingOutlined style={{ fontSize: 18, color: '#1677ff' }} />
-                    <Text strong style={{ fontSize: 14 }}>
-                      #{order.orderNumber}
-                    </Text>
-                    <Text type="secondary" style={{ fontSize: 12 }}>
-                      ({new Date(order.createdAt).toLocaleDateString('tr-TR')})
-                    </Text>
-                  </Space>
-                </Col>
-                <Col>{getStatusTag(order.orderStatus)}</Col>
-              </Row>
+          {orders.map((order) => {
+            const isCancelable = ['Ödeme Yapıldı', 'Sipariş Verildi', 'Hazırlanıyor'].includes(order.orderStatus);
+            const isDelivered = order.orderStatus === 'Teslim Edildi';
 
-              {/* Kargo Bilgileri */}
-              {order.cargoCompany && (
-                <div
-                  style={{
-                    backgroundColor: '#fafafa',
-                    padding: '8px 12px',
-                    borderRadius: 8,
-                    marginBottom: 12,
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: 12,
-                    flexWrap: 'wrap',
-                    fontSize: 12
-                  }}
-                >
-                  <Space>
-                    <CarOutlined style={{ color: '#52c41a' }} />
-                    <Text type="secondary">Kargo:</Text>
-                    <Text strong>{order.cargoCompany}</Text>
-                  </Space>
-                  {order.trackingNumber && (
-                    <Space>
-                      <BarcodeOutlined style={{ color: '#fa8c16' }} />
-                      <Text type="secondary">Takip No:</Text>
-                      <Text strong>{order.trackingNumber}</Text>
+            return (
+              <Card
+                key={order.id}
+                style={{
+                  borderRadius: 12,
+                  border: '1px solid #e8e8e8',
+                  boxShadow: '0 2px 6px rgba(0,0,0,0.02)'
+                }}
+                styles={{ body: { padding: 16 } }}
+              >
+                <Row justify="space-between" align="middle" gutter={[8, 8]} style={{ marginBottom: 12 }}>
+                  <Col>
+                    <Space size={8} wrap>
+                      <ShoppingOutlined style={{ fontSize: 18, color: '#1677ff' }} />
+                      <Text strong style={{ fontSize: 14 }}>
+                        #{order.orderNumber}
+                      </Text>
+                      <Text type="secondary" style={{ fontSize: 12 }}>
+                        ({new Date(order.createdAt).toLocaleDateString('tr-TR')})
+                      </Text>
                     </Space>
-                  )}
-                </div>
-              )}
+                  </Col>
+                  <Col>{getStatusTag(order.orderStatus)}</Col>
+                </Row>
 
-              <Divider style={{ margin: '12px 0' }} />
-
-              {/* Sipariş Kalemleri */}
-              <Space direction="vertical" size={16} style={{ width: '100%' }}>
-                {order.items?.map((item) => (
-                  <Row key={item.id} justify="space-between" align="middle" gutter={[12, 12]} style={{ width: '100%' }}>
-                    <Col xs={24} sm={15}>
-                      <div
-                        onClick={() => handleProductClick(item.id)}
-                        style={{
-                          display: 'flex',
-                          alignItems: 'center',
-                          gap: 12,
-                          cursor: 'pointer',
-                          borderRadius: 8
-                        }}
-                      >
-                        <Avatar
-                          shape="square"
-                          size={48}
-                          src={item.image}
-                          style={{ borderRadius: 6, flexShrink: 0 }}
-                        />
-                        <div style={{ minWidth: 0, flex: 1 }}>
-                          <Text
-                            strong
-                            style={{
-                              fontSize: 13,
-                              display: 'block',
-                              color: '#262626'
-                            }}
-                            ellipsis
-                          >
-                            {item.name} <RightOutlined style={{ fontSize: 10, color: '#bfbfbf' }} />
-                          </Text>
-                          <Text type="secondary" style={{ fontSize: 12 }}>
-                            {item.quantity} Adet x ₺{item.price.toLocaleString('tr-TR')}
-                          </Text>
-                        </div>
-                      </div>
-                    </Col>
-
-                    <Col xs={24} sm={9} className="mobile-text-left" style={{ textAlign: 'right' }}>
-                      <Space direction="vertical" align="end" size={4} className="mobile-full-width">
-                        <Text strong style={{ fontSize: 14 }}>
-                          ₺{item.totalPrice.toLocaleString('tr-TR')}
-                        </Text>
-
-                        {item.returnStatus ? (
-                          <Tag color="orange" style={{ borderRadius: 6 }}>
-                            {item.returnStatus}
-                          </Tag>
-                        ) : (
-                          order.orderStatus === 'Teslim Edildi' && (
-                            <Button
-                              type="default"
-                              danger
-                              size="small"
-                              icon={<RollbackOutlined />}
-                              onClick={() => {
-                                setSelectedReturnItem({
-                                  orderId: order.id,
-                                  productId: item.id,
-                                  productName: item.name
-                                });
-                                form.resetFields();
-                                setReturnModalOpen(true);
-                              }}
-                              style={{ borderRadius: 6, fontSize: 12 }}
-                            >
-                              İade Talebi
-                            </Button>
-                          )
-                        )}
+                {order.cargoCompany && (
+                  <div
+                    style={{
+                      backgroundColor: '#fafafa',
+                      padding: '8px 12px',
+                      borderRadius: 8,
+                      marginBottom: 12,
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: 12,
+                      flexWrap: 'wrap',
+                      fontSize: 12
+                    }}
+                  >
+                    <Space>
+                      <CarOutlined style={{ color: '#52c41a' }} />
+                      <Text type="secondary">Kargo:</Text>
+                      <Text strong>{order.cargoCompany}</Text>
+                    </Space>
+                    {order.trackingNumber && (
+                      <Space>
+                        <BarcodeOutlined style={{ color: '#fa8c16' }} />
+                        <Text type="secondary">Takip No:</Text>
+                        <Text strong>{order.trackingNumber}</Text>
                       </Space>
-                    </Col>
-                  </Row>
-                ))}
-              </Space>
+                    )}
+                  </div>
+                )}
 
-              <Divider style={{ margin: '12px 0' }} />
+                <Divider style={{ margin: '12px 0' }} />
 
-              <Row justify="end" align="middle">
-                <Text type="secondary" style={{ marginRight: 8, fontSize: 13 }}>
-                  Toplam Tutar:
-                </Text>
-                <Title level={4} style={{ margin: 0, color: '#1677ff' }}>
-                  ₺{order.totalAmount.toLocaleString('tr-TR')}
-                </Title>
-              </Row>
-            </Card>
-          ))}
+                <Space direction="vertical" size={16} style={{ width: '100%' }}>
+                  {order.items?.map((item) => (
+                    <Row key={item.id} justify="space-between" align="middle" gutter={[12, 12]} style={{ width: '100%' }}>
+                      <Col xs={24} sm={15}>
+                        <div
+                          onClick={() => handleProductClick(item.id)}
+                          style={{
+                            display: 'flex',
+                            alignItems: 'center',
+                            gap: 12,
+                            cursor: 'pointer',
+                            borderRadius: 8
+                          }}
+                        >
+                          <Avatar
+                            shape="square"
+                            size={48}
+                            src={item.image}
+                            style={{ borderRadius: 6, flexShrink: 0 }}
+                          />
+                          <div style={{ minWidth: 0, flex: 1 }}>
+                            <Text
+                              strong
+                              style={{
+                                fontSize: 13,
+                                display: 'block',
+                                color: '#262626'
+                              }}
+                              ellipsis
+                            >
+                              {item.name} <RightOutlined style={{ fontSize: 10, color: '#bfbfbf' }} />
+                            </Text>
+                            <Text type="secondary" style={{ fontSize: 12 }}>
+                              {item.quantity} Adet x ₺{item.price.toLocaleString('tr-TR')}
+                            </Text>
+                          </div>
+                        </div>
+                      </Col>
+
+                      <Col xs={24} sm={9} className="mobile-text-left" style={{ textAlign: 'right' }}>
+                        <Space direction="vertical" align="end" size={4} className="mobile-full-width">
+                          <Text strong style={{ fontSize: 14 }}>
+                            ₺{item.totalPrice.toLocaleString('tr-TR')}
+                          </Text>
+
+                          {item.returnStatus ? (
+                            <Tag color="orange" style={{ borderRadius: 6 }}>
+                              {item.returnStatus}
+                            </Tag>
+                          ) : (
+                            isDelivered && (
+                              <Button
+                                type="default"
+                                danger
+                                size="small"
+                                icon={<RollbackOutlined />}
+                                onClick={() => {
+                                  setSelectedReturnItem({
+                                    orderId: order.id,
+                                    productId: item.id,
+                                    productName: item.name
+                                  });
+                                  form.resetFields();
+                                  setReturnModalOpen(true);
+                                }}
+                                style={{ borderRadius: 6, fontSize: 12 }}
+                              >
+                                İade Talebi
+                              </Button>
+                            )
+                          )}
+                        </Space>
+                      </Col>
+                    </Row>
+                  ))}
+                </Space>
+
+                <Divider style={{ margin: '12px 0' }} />
+
+                <Row justify="space-between" align="middle">
+                  <Col>
+                    {isCancelable && (
+                      <Popconfirm
+                        title="Siparişi İptal Et"
+                        description="Siparişi iptal etmek istediğinize emin misiniz?"
+                        onConfirm={() => handleCancelOrder(order.id)}
+                        okText="Evet, İptal Et"
+                        cancelText="Hayır"
+                        okButtonProps={{ danger: true, loading: cancellingOrder }}
+                      >
+                        <Button type="primary" danger ghost icon={<CloseCircleOutlined />}>
+                          Siparişi İptal Et
+                        </Button>
+                      </Popconfirm>
+                    )}
+                  </Col>
+                  <Col>
+                    <Space align="center">
+                      <Text type="secondary" style={{ fontSize: 13 }}>
+                        Toplam Tutar:
+                      </Text>
+                      <Title level={4} style={{ margin: 0, color: '#1677ff' }}>
+                        ₺{order.totalAmount.toLocaleString('tr-TR')}
+                      </Title>
+                    </Space>
+                  </Col>
+                </Row>
+              </Card>
+            );
+          })}
         </Space>
       )}
 
@@ -386,7 +441,7 @@ const MyOrders = () => {
           <Form
             form={form}
             layout="vertical"
-            onFinish={handleCreateCreateReturn}
+            onFinish={handleCreateReturn}
             style={{ marginTop: 16 }}
           >
             <div style={{ backgroundColor: '#fafafa', padding: 12, borderRadius: 8, marginBottom: 16 }}>

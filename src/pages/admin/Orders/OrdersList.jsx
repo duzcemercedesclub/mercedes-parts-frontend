@@ -46,20 +46,21 @@ const ORDER_STATUS_COLORS = {
   'Hazırlanıyor': 'orange',
   'Kargoya Verildi': 'purple',
   'Teslim Edildi': 'green',
-  'İptal Edildi': 'red'
+  'İptal Edildi': 'red',
+  'İade Talebi Oluşturuldu': 'gold',
+  'İade Onaylandı (Para İadesi Yapıldı)': 'magenta',
+  'İade Reddedildi': 'volcano'
 };
 
 const OrdersList = () => {
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(false);
 
-  // Düzenleme / Yönet Modalı
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [selectedOrder, setSelectedOrder] = useState(null);
   const [updating, setUpdating] = useState(false);
   const [form] = Form.useForm();
 
-  // Detay Modalı State'leri
   const [isDetailModalOpen, setIsDetailModalOpen] = useState(false);
   const [detailOrder, setDetailOrder] = useState(null);
 
@@ -67,7 +68,6 @@ const OrdersList = () => {
     setLoading(true);
     try {
       let res = await fetch(`${API_URL}/api/admin/orders`);
-      
       if (!res.ok) {
         res = await fetch(`${API_URL}/api/orders`);
       }
@@ -93,16 +93,10 @@ const OrdersList = () => {
 
   const formatAddress = (addr) => {
     if (!addr) return 'Adres bilgisi bulunmuyor.';
-    
     let parsed = addr;
     if (typeof addr === 'string') {
-      try {
-        parsed = JSON.parse(addr);
-      } catch (e) {
-        return addr;
-      }
+      try { parsed = JSON.parse(addr); } catch (e) { return addr; }
     }
-
     if (typeof parsed === 'object' && parsed !== null) {
       const parts = [
         parsed.fullName,
@@ -113,10 +107,8 @@ const OrdersList = () => {
         parsed.city,
         parsed.country
       ].filter(Boolean);
-
       return parts.length > 0 ? parts.join(', ') : 'Adres detayı bulunamadı.';
     }
-
     return String(parsed);
   };
 
@@ -149,7 +141,7 @@ const OrdersList = () => {
       const data = await response.json();
 
       if (response.ok) {
-        message.success('Sipariş durumu ve kargo bilgileri güncellendi.');
+        message.success('Sipariş durumu ve bilgileri güncellendi.');
         setIsEditModalOpen(false);
         fetchOrders();
       } else {
@@ -199,7 +191,7 @@ const OrdersList = () => {
       dataIndex: 'orderStatus',
       key: 'orderStatus',
       render: (status) => (
-        <Tag color={ORDER_STATUS_COLORS[status] || 'default'} variant="filled">
+        <Tag color={ORDER_STATUS_COLORS[status] || 'default'}>
           {status || 'Ödeme Yapıldı'}
         </Tag>
       ),
@@ -210,7 +202,7 @@ const OrdersList = () => {
       render: (_, record) => (
         record.cargoCompany ? (
           <div>
-            <Tag icon={<TruckOutlined />} color="cyan" variant="filled">
+            <Tag icon={<TruckOutlined />} color="cyan">
               {record.cargoCompany}
             </Tag>
             <br />
@@ -250,11 +242,11 @@ const OrdersList = () => {
 
   return (
     <div style={{ padding: 24 }}>
-      <Card variant="outlined" styles={{ body: { padding: '24px' } }}>
+      <Card styles={{ body: { padding: '24px' } }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20 }}>
           <div>
             <Title level={3} style={{ margin: 0 }}>Sipariş Yönetimi</Title>
-            <Text type="secondary">Sipariş durumlarını ve kargo gönderim bilgilerini yönetin</Text>
+            <Text type="secondary">Sipariş durumlarını, kargo bilgilerini ve iade/iptal süreçlerini yönetin</Text>
           </div>
           <Button type="primary" icon={<ReloadOutlined />} onClick={fetchOrders} loading={loading}>
             Yenile
@@ -270,7 +262,7 @@ const OrdersList = () => {
         />
       </Card>
 
-      {/* 1. SİPARİŞ DETAYLARI ORTADA AÇILAN MODAL */}
+      {/* DETAY MODALI */}
       <Modal
         title={
           <Space>
@@ -291,7 +283,6 @@ const OrdersList = () => {
       >
         {detailOrder && (
           <div style={{ padding: '8px 0' }}>
-            {/* Müşteri ve Sipariş Özeti */}
             <Descriptions title={<Space><UserOutlined /> Müşteri & Sipariş Özeti</Space>} bordered size="small" column={{ xs: 1, sm: 2 }}>
               <Descriptions.Item label="Sipariş No">
                 <strong>#{detailOrder.orderNumber || detailOrder.id}</strong>
@@ -306,7 +297,7 @@ const OrdersList = () => {
                 {detailOrder.user?.email || '-'}
               </Descriptions.Item>
               <Descriptions.Item label="Sipariş Durumu">
-                <Tag color={ORDER_STATUS_COLORS[detailOrder.orderStatus] || 'default'} variant="filled">
+                <Tag color={ORDER_STATUS_COLORS[detailOrder.orderStatus] || 'default'}>
                   {detailOrder.orderStatus || 'Ödeme Yapıldı'}
                 </Tag>
               </Descriptions.Item>
@@ -319,14 +310,13 @@ const OrdersList = () => {
 
             <Divider style={{ margin: '16px 0' }} />
 
-            {/* Kargo ve Adres Bilgileri */}
             <Descriptions title={<Space><TruckOutlined /> Teslimat & Kargo Bilgileri</Space>} bordered size="small" column={1}>
               <Descriptions.Item label="Teslimat Adresi">
                 {formatAddress(detailOrder.user?.address)}
               </Descriptions.Item>
               <Descriptions.Item label="Kargo Firması">
                 {detailOrder.cargoCompany ? (
-                  <Tag icon={<TruckOutlined />} color="cyan" variant="filled">
+                  <Tag icon={<TruckOutlined />} color="cyan">
                     {detailOrder.cargoCompany}
                   </Tag>
                 ) : (
@@ -340,7 +330,6 @@ const OrdersList = () => {
 
             <Divider style={{ margin: '16px 0' }} />
 
-            {/* Ürünler Tablosu */}
             <div style={{ marginBottom: 8 }}>
               <Space><ShoppingOutlined /><Text strong>Satın Alınan Ürünler</Text></Space>
             </div>
@@ -358,14 +347,12 @@ const OrdersList = () => {
                   render: (text, item) => {
                     const productId = item.productId || item.product_id || item.id;
                     const productUrl = `/product/${productId}`;
-
                     return (
                       <a 
                         href={productUrl} 
                         target="_blank" 
                         rel="noopener noreferrer" 
                         style={{ color: '#1890ff', fontWeight: 600, display: 'inline-flex', alignItems: 'center', gap: '6px' }}
-                        title="Ürün detay sayfasına git"
                       >
                         {text || 'İsimsiz Ürün'}
                         <ExportOutlined style={{ fontSize: 12 }} />
@@ -403,7 +390,7 @@ const OrdersList = () => {
         )}
       </Modal>
 
-      {/* 2. SİPARİŞ DURUMU VE KARGO GÜNCELLEME MODALI */}
+      {/* SİPARİŞ VEYA İADE DURUMU GÜNCELLEME MODALI */}
       <Modal
         title={`Sipariş Yönetimi (#${selectedOrder?.orderNumber || selectedOrder?.id})`}
         open={isEditModalOpen}
@@ -420,8 +407,8 @@ const OrdersList = () => {
         >
           <Form.Item
             name="orderStatus"
-            label="Sipariş Durumu"
-            rules={[{ required: true, message: 'Lütfen bir sipariş durumu seçin.' }]}
+            label="Sipariş / İade Durumu"
+            rules={[{ required: true, message: 'Lütfen bir durum seçin.' }]}
           >
             <Select placeholder="Sipariş Durumu Seçin">
               <Option value="Ödeme Yapıldı">Ödeme Yapıldı</Option>
@@ -429,7 +416,10 @@ const OrdersList = () => {
               <Option value="Hazırlanıyor">Hazırlanıyor</Option>
               <Option value="Kargoya Verildi">Kargoya Verildi</Option>
               <Option value="Teslim Edildi">Teslim Edildi</Option>
-              <Option value="İptal Edildi">İptal Edildi</Option>
+              <Option value="İptal Edildi">İptal Edildi (Kullanıcı Talebi / Manuel)</Option>
+              <Option value="İade Talebi Oluşturuldu">İade Talebi Oluşturuldu</Option>
+              <Option value="İade Onaylandı (Para İadesi Yapıldı)">İade Onaylandı & Para İadesi Yapıldı</Option>
+              <Option value="İade Reddedildi">İade Reddedildi</Option>
             </Select>
           </Form.Item>
 
