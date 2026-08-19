@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { Routes, Route, Navigate } from "react-router-dom";
-import { AuthProvider, useAuth } from "./context/AuthContext";
+import { useAuth } from "./context/AuthContext";
 import ScrollToTop from './components/ScrollToTop';
 import DemoNoticeModal from './components/ui/DemoNoticeModal/DemoNoticeModal';
 
@@ -58,14 +58,12 @@ import OrdersList from './pages/admin/Orders/OrdersList';
 
 import Coupons from './pages/admin/Coupon/AdminCouponManager';
 
-
 import GeneralAndLogoSettings from "./pages/admin/Settings/GeneralAndLogoSettings";
 import SocialMediaManager from "./pages/admin/Settings/SocialMediaManager";
 import SmtpSettings from "./pages/admin/Settings/SmtpSettings";
 import SeoSettings from "./pages/admin/Settings/SeoSettings";
 import FooterSettings from "./pages/admin/Settings/FooterSettings";
 import ContactManagement from "./pages/admin/Contact/ContactManagement";
-
 
 // --- GÜVENLİK KİLİDİ (PROTECTED ROUTE) ---
 const ProtectedAdminRoute = ({ children }) => {
@@ -79,12 +77,11 @@ const ProtectedAdminRoute = ({ children }) => {
   return children;
 };
 
-
 const App = () => {
   const [showDemoModal, setShowDemoModal] = useState(true);
 
   return (
-    <AuthProvider>
+    <>
       {/* DENEME AŞAMASI MODAL UYARISI */}
       {showDemoModal && (
         <DemoNoticeModal onClose={() => setShowDemoModal(false)} />
@@ -166,7 +163,6 @@ const App = () => {
 
           <Route path="coupon" element={<Coupons />} />
 
-
           {/* AYARLAR YÖNETİMİ MODÜLÜ */}
           <Route path="settings/general" element={<GeneralAndLogoSettings />} />
           <Route path="settings/social" element={<SocialMediaManager />} />
@@ -176,7 +172,7 @@ const App = () => {
           <Route path="settings/contact" element={<ContactManagement />} />
         </Route>
       </Routes>
-    </AuthProvider>
+    </>
   );
 };
 

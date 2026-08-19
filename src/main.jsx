@@ -1,16 +1,20 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
 import { BrowserRouter } from 'react-router-dom';
-import { CartProvider } from './context/CartContext'; // <-- Yeni eklenen çizgi
+import { AuthProvider } from './context/AuthContext'; // <-- AuthProvider eklendi
+import { CartProvider } from './context/CartContext';
 import App from './App.jsx';
 import './index.css';
 
 ReactDOM.createRoot(document.getElementById('root')).render(
   <React.StrictMode>
     <BrowserRouter>
-      <CartProvider> {/* <-- Uygulamayı sarmaladık */}
-        <App />
-      </CartProvider>
+      {/* AuthProvider, CartProvider'ın üstünde olmalıdır */}
+      <AuthProvider>
+        <CartProvider>
+          <App />
+        </CartProvider>
+      </AuthProvider>
     </BrowserRouter>
   </React.StrictMode>
 );
