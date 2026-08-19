@@ -1,5 +1,6 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
+import axios from 'axios';
 import { useCart } from '../../context/CartContext';
 import { useAuth } from '../../context/AuthContext';
 import './Cart.css';
@@ -10,21 +11,80 @@ const Cart = () => {
   const navigate = useNavigate();
 
   const [couponCode, setCouponCode] = useState('');
-  const [discountAmount, setDiscountAmount] = useState(0);
+  const [appliedCoupon, setAppliedCoupon] = useState(null); // Tek geçerli kupon objesi
+  const [couponLoading, setCouponLoading] = useState(false);
   const [loading, setLoading] = useState(false);
 
+  const apiUrl = import.meta.env.VITE_API_URL || import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000';
+
+  // Ara toplam hesabı
   const subtotal = cart.reduce((total, item) => total + (Number(item.price) || 0) * item.quantity, 0);
+
+  // Kupon İndirimi Hesabı (Yüzde veya Sabit TL)
+  let discountAmount = 0;
+  if (appliedCoupon) {
+    if (appliedCoupon.discount_type === 'percentage') {
+      discountAmount = (subtotal * Number(appliedCoupon.discount_amount)) / 100;
+    } else {
+      discountAmount = Number(appliedCoupon.discount_amount);
+    }
+  }
+
+  // Minimum harcama altı kalırsa kuponu otomatik kaldır
+  useEffect(() => {
+    if (appliedCoupon && appliedCoupon.min_spend > 0 && subtotal < appliedCoupon.min_spend) {
+      alert(`Sepet tutarı minimum ${appliedCoupon.min_spend} TL altına düştüğü için kupon kaldırıldı.`);
+      setAppliedCoupon(null);
+    }
+  }, [subtotal, appliedCoupon]);
+
   const shippingCost = subtotal > 1500 || subtotal === 0 ? 0 : 150;
   const totalAmount = Math.max(0, subtotal + shippingCost - discountAmount);
 
-  const handleApplyCoupon = () => {
-    if (couponCode.trim().toUpperCase() === 'INDIRIM100') {
-      setDiscountAmount(100);
-      alert('100 TL Kupon başarıyla uygulandı!');
-    } else {
-      setDiscountAmount(0);
-      alert('Geçersiz veya süresi dolmuş kupon kodu.');
+  // KUPON UYGULAMA (Sadece 1 Kupon İznine Göre)
+  const handleApplyCoupon = async () => {
+    if (!couponCode.trim()) {
+      alert('Lütfen geçerli bir kupon kodu giriniz.');
+      return;
     }
+
+    if (!token) {
+      alert('Kupon kullanabilmek için lütfen giriş yapınız.');
+      navigate('/login');
+      return;
+    }
+
+    try {
+      setCouponLoading(true);
+      
+      // Backend kupon doğrulama servisi
+      const response = await axios.post(
+        `${apiUrl}/api/coupons/validate`,
+        {
+          code: couponCode.trim(),
+          subtotal: subtotal
+        },
+        {
+          headers: { Authorization: `Bearer ${token}` }
+        }
+      );
+
+      if (response.data.success) {
+        // Kullanıcının daha önceden uygulanmış kuponu varsa üzerine yazar (Her kullanıcının 1 kupon hakkı)
+        setAppliedCoupon(response.data.coupon);
+        setCouponCode('');
+        alert(`"${response.data.coupon.code}" kuponu başarıyla uygulandı!`);
+      }
+    } catch (error) {
+      console.error('Kupon Doğrulama Hatası:', error);
+      alert(error.response?.data?.message || 'Kupon kodu geçersiz veya süresi dolmuş.');
+    } finally {
+      setCouponLoading(false);
+    }
+  };
+
+  const handleRemoveCoupon = () => {
+    setAppliedCoupon(null);
   };
 
   const renderConditionText = (cond) => {
@@ -34,8 +94,9 @@ const Cart = () => {
     return cond;
   };
 
+  // ÖDEME ADIMINA GEÇİŞ (Stripe/Ödeme Sayfası)
   const handleCheckout = async () => {
-    // 1. KONTROL: Kullanıcı oturum kontrolü
+    // 1. Oturum Kontrolü
     if (!token || !user) {
       alert('Alışverişi tamamlamak için lütfen giriş yapınız.');
       navigate('/login');
@@ -45,7 +106,7 @@ const Cart = () => {
     try {
       setLoading(true);
 
-      // 2. KONTROL: Güncel adres bilgisini sunucudan çekip doğrula
+      // 2. Güncel profil ve adres bilgisi kontrolü
       let currentUser = user;
       if (fetchUserProfile) {
         const refreshedUser = await fetchUserProfile();
@@ -80,8 +141,8 @@ const Cart = () => {
         return;
       }
 
-      // 3. KONTROL: Stripe Ödeme Oturumu Başlat
-      const response = await fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:5000'}/api/checkout/create-session`, {
+      // 3. Ödeme Oturumu Oluştur (İndirimler Dahil)
+      const response = await fetch(`${apiUrl}/api/checkout/create-session`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -92,6 +153,7 @@ const Cart = () => {
           user: currentUser,
           shippingCost,
           discountAmount,
+          couponCode: appliedCoupon ? appliedCoupon.code : null,
           totalAmount,
         }),
       });
@@ -183,20 +245,38 @@ const Cart = () => {
               </tbody>
             </table>
 
-            <div className="cart-coupon-section" style={{ marginTop: '20px', display: 'flex', gap: '10px' }}>
-              <input 
-                type="text" 
-                placeholder="Kupon Kodu" 
-                value={couponCode} 
-                onChange={(e) => setCouponCode(e.target.value)}
-                style={{ padding: '10px', border: '1px solid #ccc', borderRadius: '4px', flex: '1', maxWidth: '300px' }}
-              />
-              <button 
-                onClick={handleApplyCoupon} 
-                style={{ backgroundColor: '#1a1a1a', color: 'white', border: 'none', padding: '10px 20px', borderRadius: '4px', cursor: 'pointer' }}
-              >
-                Uygula
-              </button>
+            {/* KUPON GİRİŞ VE UYGULANAN KUPON ALANI */}
+            <div className="cart-coupon-section" style={{ marginTop: '20px' }}>
+              {!appliedCoupon ? (
+                <div style={{ display: 'flex', gap: '10px' }}>
+                  <input 
+                    type="text" 
+                    placeholder="Kupon Kodu Giriniz" 
+                    value={couponCode} 
+                    onChange={(e) => setCouponCode(e.target.value.toUpperCase())}
+                    style={{ padding: '10px', border: '1px solid #ccc', borderRadius: '4px', flex: '1', maxWidth: '300px' }}
+                  />
+                  <button 
+                    onClick={handleApplyCoupon}
+                    disabled={couponLoading}
+                    style={{ backgroundColor: '#1a1a1a', color: 'white', border: 'none', padding: '10px 20px', borderRadius: '4px', cursor: 'pointer' }}
+                  >
+                    {couponLoading ? 'Kontrol Ediliyor...' : 'Kupon Uygula'}
+                  </button>
+                </div>
+              ) : (
+                <div style={{ display: 'inline-flex', alignItems: 'center', gap: '12px', backgroundColor: '#e6f7ff', border: '1px dashed #1890ff', padding: '10px 16px', borderRadius: '6px' }}>
+                  <span style={{ fontSize: '14px', fontWeight: '600', color: '#0050b3' }}>
+                    Uygulanan Kupon: <strong>{appliedCoupon.code}</strong>
+                  </span>
+                  <button 
+                    onClick={handleRemoveCoupon} 
+                    style={{ background: 'none', border: 'none', color: '#ff4d4f', cursor: 'pointer', fontWeight: 'bold' }}
+                  >
+                    Kaldır
+                  </button>
+                </div>
+              )}
             </div>
 
             <div className="cart-actions-bottom">
@@ -217,7 +297,7 @@ const Cart = () => {
               
               {discountAmount > 0 && (
                 <div className="summary-row" style={{ color: '#d0021b' }}>
-                  <span>Kupon İndirimi</span>
+                  <span>Kupon İndirimi ({appliedCoupon?.code})</span>
                   <strong>-{discountAmount.toFixed(2)} TL</strong>
                 </div>
               )}
@@ -243,7 +323,7 @@ const Cart = () => {
                 onClick={handleCheckout}
                 disabled={loading}
               >
-                {loading ? 'Yönlendiriliyor...' : 'Alışverişi Tamamla'}
+                {loading ? 'Ödemeye Yönlendiriliyor...' : 'Alışverişi Tamamla'}
               </button>
             </div>
           </div>

@@ -1,12 +1,19 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
+import { useAuth } from './AuthContext';
 
 const CartContext = createContext();
 
 export const CartProvider = ({ children }) => {
-  // LocalStorage'dan sepet verilerini çek
+  const { user } = useAuth();
+  
+  // Kullanıcıya özel dinamik depolama anahtarları
+  const cartStorageKey = user?.id ? `cart_user_${user.id}` : 'cart_guest';
+  const wishlistStorageKey = user?.id ? `wishlist_user_${user.id}` : 'wishlist_guest';
+
+  // Kullanıcı değiştikçe sepeti ilgili kullanıcı anahtarından yükle
   const [cart, setCart] = useState(() => {
     try {
-      const savedCart = localStorage.getItem('cart');
+      const savedCart = localStorage.getItem(cartStorageKey);
       return savedCart ? JSON.parse(savedCart) : [];
     } catch (error) {
       console.error('Cart LocalStorage okuma hatası:', error);
@@ -14,10 +21,10 @@ export const CartProvider = ({ children }) => {
     }
   });
 
-  // LocalStorage'dan favori verilerini çek
+  // Kullanıcı değiştikçe favorileri ilgili kullanıcı anahtarından yükle
   const [wishlist, setWishlist] = useState(() => {
     try {
-      const savedWishlist = localStorage.getItem('wishlist');
+      const savedWishlist = localStorage.getItem(wishlistStorageKey);
       return savedWishlist ? JSON.parse(savedWishlist) : [];
     } catch (error) {
       console.error('Wishlist LocalStorage okuma hatası:', error);
@@ -25,14 +32,32 @@ export const CartProvider = ({ children }) => {
     }
   });
 
-  // State değiştikçe LocalStorage güncelle
+  // Kullanıcı oturumu değiştiğinde (Giriş/Çıkış) sepet ve favorileri yenile
   useEffect(() => {
-    localStorage.setItem('cart', JSON.stringify(cart));
-  }, [cart]);
+    try {
+      const savedCart = localStorage.getItem(cartStorageKey);
+      setCart(savedCart ? JSON.parse(savedCart) : []);
+    } catch (e) {
+      setCart([]);
+    }
 
+    try {
+      const savedWishlist = localStorage.getItem(wishlistStorageKey);
+      setWishlist(savedWishlist ? JSON.parse(savedWishlist) : []);
+    } catch (e) {
+      setWishlist([]);
+    }
+  }, [user?.id]);
+
+  // Sepet değiştikçe aktif kullanıcının key'ine kaydet
   useEffect(() => {
-    localStorage.setItem('wishlist', JSON.stringify(wishlist));
-  }, [wishlist]);
+    localStorage.setItem(cartStorageKey, JSON.stringify(cart));
+  }, [cart, cartStorageKey]);
+
+  // Favoriler değiştikçe aktif kullanıcının key'ine kaydet
+  useEffect(() => {
+    localStorage.setItem(wishlistStorageKey, JSON.stringify(wishlist));
+  }, [wishlist, wishlistStorageKey]);
 
   // Sepete Ürün Ekle / Adet Artır
   const addToCart = (product) => {
@@ -60,14 +85,14 @@ export const CartProvider = ({ children }) => {
     });
   };
 
-  // Sepetteki Ürün Adedini Düşür (DÜZELTİLDİ)
+  // Sepetteki Ürün Adedini Düşür
   const decreaseQuantity = (productId) => {
     setCart((prevCart) =>
       prevCart
         .map((item) =>
           item.id === productId ? { ...item, quantity: item.quantity - 1 } : item
         )
-        .filter((item) => item.quantity > 0) // Adet 0 olursa sepetten otomatik sil
+        .filter((item) => item.quantity > 0)
     );
   };
 
@@ -81,7 +106,7 @@ export const CartProvider = ({ children }) => {
     setCart([]);
   };
 
-  // Favorilere Ekle / Çıkar (Toggle)
+  // Favorilere Ekle / Çıkar
   const toggleWishlist = (product) => {
     setWishlist((prevWishlist) => {
       const exists = prevWishlist.some((item) => item.id === product.id);
@@ -92,7 +117,6 @@ export const CartProvider = ({ children }) => {
     });
   };
 
-  // Ürünün favorilerde olup olmadığını kontrol eden yardımcı fonksiyon
   const isInWishlist = (productId) => {
     return wishlist.some((item) => item.id === productId);
   };
@@ -103,7 +127,7 @@ export const CartProvider = ({ children }) => {
         cart,
         wishlist,
         addToCart,
-        decreaseQuantity, // Buraya eklendi!
+        decreaseQuantity,
         removeFromCart,
         clearCart,
         toggleWishlist,
