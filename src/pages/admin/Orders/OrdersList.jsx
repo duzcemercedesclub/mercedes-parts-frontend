@@ -12,7 +12,8 @@ import {
   Input, 
   Space,
   Descriptions,
-  Divider
+  Divider,
+  Alert
 } from 'antd';
 import { 
   EyeOutlined, 
@@ -21,6 +22,8 @@ import {
   TruckOutlined,
   UserOutlined,
   ShoppingOutlined,
+  CreditCardOutlined,
+  RollbackOutlined,
   ExportOutlined
 } from '@ant-design/icons';
 
@@ -67,9 +70,10 @@ const OrdersList = () => {
   const fetchOrders = async () => {
     setLoading(true);
     try {
-      let res = await fetch(`${API_URL}/api/admin/orders`);
+      const res = await fetch(`${API_URL}/api/admin/orders`);
+      
       if (!res.ok) {
-        res = await fetch(`${API_URL}/api/orders`);
+        throw new Error(`Sunucu hatası: ${res.status}`);
       }
 
       const data = await res.json();
@@ -132,7 +136,7 @@ const OrdersList = () => {
 
     setUpdating(true);
     try {
-      const response = await fetch(`${API_URL}/api/orders/${selectedOrder.id}`, {
+      const response = await fetch(`${API_URL}/api/admin/orders/${selectedOrder.id}`, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(values),
@@ -141,7 +145,7 @@ const OrdersList = () => {
       const data = await response.json();
 
       if (response.ok) {
-        message.success('Sipariş durumu ve bilgileri güncellendi.');
+        message.success('Sipariş ve İade durumu güncellendi.');
         setIsEditModalOpen(false);
         fetchOrders();
       } else {
@@ -187,32 +191,13 @@ const OrdersList = () => {
       render: (amount) => <Text strong style={{ color: '#fa541c' }}>{Number(amount || 0).toFixed(2)} TL</Text>,
     },
     {
-      title: 'Sipariş Durumu',
+      title: 'Sipariş / İade Durumu',
       dataIndex: 'orderStatus',
       key: 'orderStatus',
       render: (status) => (
         <Tag color={ORDER_STATUS_COLORS[status] || 'default'}>
           {status || 'Ödeme Yapıldı'}
         </Tag>
-      ),
-    },
-    {
-      title: 'Kargo Bilgileri',
-      key: 'cargoInfo',
-      render: (_, record) => (
-        record.cargoCompany ? (
-          <div>
-            <Tag icon={<TruckOutlined />} color="cyan">
-              {record.cargoCompany}
-            </Tag>
-            <br />
-            <Text type="secondary" style={{ fontSize: 11 }}>
-              Takip No: {record.trackingNumber || 'Girilmedi'}
-            </Text>
-          </div>
-        ) : (
-          <Text type="secondary" style={{ fontSize: 12 }}>Henüz Girilmedi</Text>
-        )
       ),
     },
     {
@@ -245,8 +230,8 @@ const OrdersList = () => {
       <Card styles={{ body: { padding: '24px' } }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20 }}>
           <div>
-            <Title level={3} style={{ margin: 0 }}>Sipariş Yönetimi</Title>
-            <Text type="secondary">Sipariş durumlarını, kargo bilgilerini ve iade/iptal süreçlerini yönetin</Text>
+            <Title level={3} style={{ margin: 0 }}>Sipariş & İade Yönetimi</Title>
+            <Text type="secondary">Sipariş durumlarını, iade taleplerini ve müşteri ödeme/IBAN bilgilerini inceleyin</Text>
           </div>
           <Button type="primary" icon={<ReloadOutlined />} onClick={fetchOrders} loading={loading}>
             Yenile
@@ -283,7 +268,24 @@ const OrdersList = () => {
       >
         {detailOrder && (
           <div style={{ padding: '8px 0' }}>
-            <Descriptions title={<Space><UserOutlined /> Müşteri & Sipariş Özeti</Space>} bordered size="small" column={{ xs: 1, sm: 2 }}>
+            {detailOrder.returnData && (
+              <Alert
+                message="İade Talebi Bulunuyor"
+                description={
+                  <div>
+                    <p style={{ margin: '4px 0' }}><strong>İade Nedeni:</strong> {detailOrder.returnData.reason}</p>
+                    <p style={{ margin: '4px 0' }}><strong>Açıklama:</strong> {detailOrder.returnData.description || 'Açıklama girilmedi.'}</p>
+                    <p style={{ margin: '4px 0' }}><strong>Talep Tarihi:</strong> {new Date(detailOrder.returnData.createdAt).toLocaleString('tr-TR')}</p>
+                  </div>
+                }
+                type="warning"
+                showIcon
+                icon={<RollbackOutlined />}
+                style={{ marginBottom: 16 }}
+              />
+            )}
+
+            <Descriptions title={<Space><UserOutlined /> Müşteri Özeti</Space>} bordered size="small" column={{ xs: 1, sm: 2 }}>
               <Descriptions.Item label="Sipariş No">
                 <strong>#{detailOrder.orderNumber || detailOrder.id}</strong>
               </Descriptions.Item>
@@ -296,15 +298,33 @@ const OrdersList = () => {
               <Descriptions.Item label="E-Posta">
                 {detailOrder.user?.email || '-'}
               </Descriptions.Item>
-              <Descriptions.Item label="Sipariş Durumu">
-                <Tag color={ORDER_STATUS_COLORS[detailOrder.orderStatus] || 'default'}>
-                  {detailOrder.orderStatus || 'Ödeme Yapıldı'}
-                </Tag>
+            </Descriptions>
+
+            <Divider style={{ margin: '16px 0' }} />
+
+            <Descriptions title={<Space><CreditCardOutlined /> Ödeme ve İade Bilgileri</Space>} bordered size="small" column={{ xs: 1, sm: 2 }}>
+              <Descriptions.Item label="Ödeme Yöntemi">
+                {detailOrder.paymentInfo?.method || 'Kredi / Banka Kartı'}
               </Descriptions.Item>
-              <Descriptions.Item label="Toplam Tutar">
-                <Text strong style={{ color: '#fa541c', fontSize: 16 }}>
-                  {Number(detailOrder.totalAmount || 0).toFixed(2)} TL
-                </Text>
+
+              <Descriptions.Item label="Kart Bilgisi">
+                {detailOrder.paymentInfo?.cardLast4 ? (
+                  <Text strong>
+                    **** **** **** {detailOrder.paymentInfo.cardLast4} ({detailOrder.paymentInfo.cardBrand || 'Visa/Mastercard'})
+                  </Text>
+                ) : (
+                  <Text type="secondary">Kart son 4 hanesi mevcut değil</Text>
+                )}
+              </Descriptions.Item>
+
+              <Descriptions.Item label="Müşteri IBAN (İade İçin)" span={2}>
+                {detailOrder.paymentInfo?.iban ? (
+                  <Text copyable strong style={{ color: '#52c41a', fontSize: 14 }}>
+                    {detailOrder.paymentInfo.iban}
+                  </Text>
+                ) : (
+                  <Text type="secondary">IBAN bilgisi tanımlanmamış (Ödeme kart üzerinden iade edilebilir)</Text>
+                )}
               </Descriptions.Item>
             </Descriptions>
 
@@ -314,17 +334,15 @@ const OrdersList = () => {
               <Descriptions.Item label="Teslimat Adresi">
                 {formatAddress(detailOrder.user?.address)}
               </Descriptions.Item>
-              <Descriptions.Item label="Kargo Firması">
+              <Descriptions.Item label="Kargo Firması / Takip No">
                 {detailOrder.cargoCompany ? (
-                  <Tag icon={<TruckOutlined />} color="cyan">
-                    {detailOrder.cargoCompany}
-                  </Tag>
+                  <Space>
+                    <Tag color="cyan">{detailOrder.cargoCompany}</Tag>
+                    <Text strong>({detailOrder.trackingNumber || 'Takip No Girilmedi'})</Text>
+                  </Space>
                 ) : (
                   <Text type="secondary">Henüz kargo bilgisi girilmedi</Text>
                 )}
-              </Descriptions.Item>
-              <Descriptions.Item label="Kargo Takip No">
-                {detailOrder.trackingNumber || <Text type="secondary">Girilmedi</Text>}
               </Descriptions.Item>
             </Descriptions>
 
@@ -335,7 +353,7 @@ const OrdersList = () => {
             </div>
             <Table
               dataSource={detailOrder.items || []}
-              rowKey={(item, index) => item.id || item.productId || item.product_id || index}
+              rowKey={(item, index) => item.id || index}
               pagination={false}
               size="small"
               bordered
@@ -344,21 +362,16 @@ const OrdersList = () => {
                   title: 'Ürün Adı',
                   dataIndex: 'name',
                   key: 'name',
-                  render: (text, item) => {
-                    const productId = item.productId || item.product_id || item.id;
-                    const productUrl = `/product/${productId}`;
-                    return (
-                      <a 
-                        href={productUrl} 
-                        target="_blank" 
-                        rel="noopener noreferrer" 
-                        style={{ color: '#1890ff', fontWeight: 600, display: 'inline-flex', alignItems: 'center', gap: '6px' }}
-                      >
-                        {text || 'İsimsiz Ürün'}
-                        <ExportOutlined style={{ fontSize: 12 }} />
-                      </a>
-                    );
-                  },
+                  render: (text, item) => (
+                    <a 
+                      href={`/product/${item.id}`} 
+                      target="_blank" 
+                      rel="noopener noreferrer" 
+                      style={{ color: '#1890ff', fontWeight: 600 }}
+                    >
+                      {text} <ExportOutlined style={{ fontSize: 10 }} />
+                    </a>
+                  ),
                 },
                 {
                   title: 'Birim Fiyat',
@@ -375,7 +388,7 @@ const OrdersList = () => {
                   render: (q) => `x${q || 1}`,
                 },
                 {
-                  title: 'Toplam Tutar',
+                  title: 'Toplam',
                   key: 'total',
                   align: 'right',
                   render: (_, item) => (
@@ -390,9 +403,9 @@ const OrdersList = () => {
         )}
       </Modal>
 
-      {/* SİPARİŞ VEYA İADE DURUMU GÜNCELLEME MODALI */}
+      {/* GÜNCELLEME MODALI */}
       <Modal
-        title={`Sipariş Yönetimi (#${selectedOrder?.orderNumber || selectedOrder?.id})`}
+        title={`Sipariş ve İade Durumu Yönetimi (#${selectedOrder?.orderNumber || selectedOrder?.id})`}
         open={isEditModalOpen}
         onCancel={() => setIsEditModalOpen(false)}
         footer={null}
@@ -408,25 +421,22 @@ const OrdersList = () => {
           <Form.Item
             name="orderStatus"
             label="Sipariş / İade Durumu"
-            rules={[{ required: true, message: 'Lütfen bir durum seçin.' }]}
+            rules={[{ required: true, message: 'Lütfen durum seçin.' }]}
           >
-            <Select placeholder="Sipariş Durumu Seçin">
+            <Select placeholder="Durum Seçin">
               <Option value="Ödeme Yapıldı">Ödeme Yapıldı</Option>
               <Option value="Sipariş Verildi">Sipariş Verildi</Option>
               <Option value="Hazırlanıyor">Hazırlanıyor</Option>
               <Option value="Kargoya Verildi">Kargoya Verildi</Option>
               <Option value="Teslim Edildi">Teslim Edildi</Option>
-              <Option value="İptal Edildi">İptal Edildi (Kullanıcı Talebi / Manuel)</Option>
+              <Option value="İptal Edildi">İptal Edildi</Option>
               <Option value="İade Talebi Oluşturuldu">İade Talebi Oluşturuldu</Option>
               <Option value="İade Onaylandı (Para İadesi Yapıldı)">İade Onaylandı & Para İadesi Yapıldı</Option>
               <Option value="İade Reddedildi">İade Reddedildi</Option>
             </Select>
           </Form.Item>
 
-          <Form.Item
-            name="cargoCompany"
-            label="Kargo Firması"
-          >
+          <Form.Item name="cargoCompany" label="Kargo Firması">
             <Select placeholder="Kargo Firması Seçin" allowClear>
               {CARGO_COMPANIES.map((company) => (
                 <Option key={company} value={company}>{company}</Option>
@@ -434,20 +444,13 @@ const OrdersList = () => {
             </Select>
           </Form.Item>
 
-          <Form.Item
-            name="trackingNumber"
-            label="Kargo Takip Numarası"
-          >
+          <Form.Item name="trackingNumber" label="Kargo Takip Numarası">
             <Input placeholder="Örn: 1234567890" allowClear />
           </Form.Item>
 
           <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 8, marginTop: 24 }}>
-            <Button onClick={() => setIsEditModalOpen(false)}>
-              İptal
-            </Button>
-            <Button type="primary" htmlType="submit" loading={updating}>
-              Kaydet ve Güncelle
-            </Button>
+            <Button onClick={() => setIsEditModalOpen(false)}>İptal</Button>
+            <Button type="primary" htmlType="submit" loading={updating}>Kaydet ve Güncelle</Button>
           </div>
         </Form>
       </Modal>
