@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
 import { useCart } from '../../context/CartContext';
 
@@ -11,16 +11,23 @@ const CheckoutSuccess = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
+  // Çift istek atılmasını engellemek için kontrol
+  const hasRun = useRef(false);
+
   // API BASE URL TANIMLAMASI
   const apiUrl = import.meta.env.VITE_API_BASE_URL || import.meta.env.VITE_API_URL || 'https://mercedes-parts-backend.onrender.com';
 
   useEffect(() => {
-    const confirmOrder = async () => {
-      if (!sessionId) {
-        setLoading(false);
-        return;
-      }
+    if (!sessionId) {
+      setLoading(false);
+      return;
+    }
 
+    // İstek zaten gönderildiyse tekrar çalıştırma
+    if (hasRun.current) return;
+    hasRun.current = true;
+
+    const confirmOrder = async () => {
       try {
         const response = await fetch(`${apiUrl}/api/checkout/confirm-order`, {
           method: 'POST',
@@ -79,7 +86,7 @@ const CheckoutSuccess = () => {
         Sipariş Numarası: <strong>#{orderNumber}</strong>
       </p>
       <p style={{ marginTop: '5px', color: '#666' }}>
-        Ödemeniz Stripe üzerinden başarıyla gerçekleşti ve MySQL veritabanına kaydedildi.
+        Ödemeniz Stripe üzerinden başarıyla gerçekleşti ve veritabanına kaydedildi.
       </p>
       <div style={{ marginTop: '30px' }}>
         <Link to="/" style={{ padding: '12px 24px', backgroundColor: '#1a1a1a', color: '#fff', borderRadius: '4px', textDecoration: 'none' }}>

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import axios from 'axios';
 
 const Contact = () => {
@@ -23,17 +23,16 @@ const Contact = () => {
   const [loading, setLoading] = useState(false);
   const [statusMessage, setStatusMessage] = useState({ type: '', text: '' });
 
-  // URL sonundaki ekstra eğik çizgileri (slash) temizle
+  // Mesaj gönderildiğinde ekranın kayması için Referans
+  const messageRef = useRef(null);
+
   const rawApiUrl = import.meta.env.VITE_API_URL || 'http://localhost:5000';
   const API_URL = rawApiUrl.replace(/\/$/, '');
 
-  // Veritabanındaki İletişim Bilgilerini Getir
   useEffect(() => {
     const fetchSettings = async () => {
       try {
-        const res = await axios.get(`${API_URL}/api/contact/settings`);
-        
-        // Yanıt dizi ([{}]) veya obje ({}) gelse de doğru veriyi al
+        const res = await axios.get(`${API_URL}/api/contact/settings`, { timeout: 8000 });
         const data = Array.isArray(res.data) ? res.data[0] : res.data;
         
         if (data && typeof data === 'object') {
@@ -56,7 +55,6 @@ const Contact = () => {
     fetchSettings();
   }, [API_URL]);
 
-  // Veritabanına tam <iframe> kodu yapıştırılmışsa içinden sadece src URL'ini ayıkla
   const getMapSrc = (url) => {
     if (!url) return '';
     const match = url.match(/src=["']([^"']+)["']/);
@@ -74,22 +72,35 @@ const Contact = () => {
     setStatusMessage({ type: '', text: '' });
 
     try {
-      await axios.post(`${API_URL}/api/contact/send-message`, formData);
+      const res = await axios.post(
+        `${API_URL}/api/contact/send-message`, 
+        formData,
+        { timeout: 12000 } // 12 saniye zaman aşımı koruması
+      );
 
       setStatusMessage({
         type: 'success',
-        text: 'Mesajınız başarıyla iletildi. En kısa sürede sizinle iletişime geçeceğiz!'
+        text: res.data?.message || 'Mesajınız başarıyla iletildi. En kısa sürede sizinle iletişime geçeceğiz!'
       });
 
       setFormData({ name: '', email: '', phone: '', subject: '', message: '' });
     } catch (error) {
       console.error('İletişim formu gönderme hatası:', error);
+      
+      const errorText = error.code === 'ECONNABORTED'
+        ? 'Ağ zaman aşımına uğradı. Mesajınız iletilmiş olabilir, lütfen tekrar denemeden önce bekleyin.'
+        : error.response?.data?.message || 'Mesaj gönderilirken bir hata oluştu. Lütfen tekrar deneyiniz.';
+
       setStatusMessage({
         type: 'error',
-        text: error.response?.data?.message || 'Mesaj gönderilirken bir hata oluştu. Lütfen tekrar deneyiniz.'
+        text: errorText
       });
     } finally {
       setLoading(false);
+      // Kullanıcıya mesaj bilgisini göstermek için mesaj alanına yumuşak kaydır
+      if (messageRef.current) {
+        messageRef.current.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      }
     }
   };
 
@@ -104,7 +115,6 @@ const Contact = () => {
         
         {/* SOL KOLON: İletişim Bilgileri */}
         <div style={{ backgroundColor: '#f9f9f9', padding: '30px', borderRadius: '8px', border: '1px solid #eee' }}>
-          
           <h3 style={{ fontSize: '20px', fontWeight: '600', marginBottom: '20px', color: '#1a1a1a', borderBottom: '2px solid #2b4c7e', paddingBottom: '10px' }}>
             {settings.info_title || 'Bizimle İletişime Geçin'}
           </h3>
@@ -114,59 +124,37 @@ const Contact = () => {
           </p>
 
           <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
-            
-            {/* Adres */}
             <div style={{ display: 'flex', alignItems: 'flex-start', gap: '15px' }}>
-              <div style={{ width: '40px', height: '40px', backgroundColor: '#2b4c7e', color: 'white', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-                📍
-              </div>
+              <div style={{ width: '40px', height: '40px', backgroundColor: '#2b4c7e', color: 'white', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>📍</div>
               <div>
                 <strong style={{ display: 'block', color: '#333', marginBottom: '3px' }}>Adresimiz</strong>
-                <span style={{ color: '#666', fontSize: '14px', lineHeight: '1.4' }}>
-                  {settings.address}
-                </span>
+                <span style={{ color: '#666', fontSize: '14px', lineHeight: '1.4' }}>{settings.address}</span>
               </div>
             </div>
 
-            {/* Telefon */}
             <div style={{ display: 'flex', alignItems: 'flex-start', gap: '15px' }}>
-              <div style={{ width: '40px', height: '40px', backgroundColor: '#2b4c7e', color: 'white', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-                📞
-              </div>
+              <div style={{ width: '40px', height: '40px', backgroundColor: '#2b4c7e', color: 'white', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>📞</div>
               <div>
                 <strong style={{ display: 'block', color: '#333', marginBottom: '3px' }}>Telefon</strong>
-                <a href={`tel:${settings.phone}`} style={{ color: '#666', textDecoration: 'none', fontSize: '14px' }}>
-                  {settings.phone}
-                </a>
+                <a href={`tel:${settings.phone}`} style={{ color: '#666', textDecoration: 'none', fontSize: '14px' }}>{settings.phone}</a>
               </div>
             </div>
 
-            {/* E-posta */}
             <div style={{ display: 'flex', alignItems: 'flex-start', gap: '15px' }}>
-              <div style={{ width: '40px', height: '40px', backgroundColor: '#2b4c7e', color: 'white', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-                ✉️
-              </div>
+              <div style={{ width: '40px', height: '40px', backgroundColor: '#2b4c7e', color: 'white', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>✉️</div>
               <div>
                 <strong style={{ display: 'block', color: '#333', marginBottom: '3px' }}>E-Posta</strong>
-                <a href={`mailto:${settings.email}`} style={{ color: '#666', textDecoration: 'none', fontSize: '14px' }}>
-                  {settings.email}
-                </a>
+                <a href={`mailto:${settings.email}`} style={{ color: '#666', textDecoration: 'none', fontSize: '14px' }}>{settings.email}</a>
               </div>
             </div>
 
-            {/* Çalışma Saatleri */}
             <div style={{ display: 'flex', alignItems: 'flex-start', gap: '15px' }}>
-              <div style={{ width: '40px', height: '40px', backgroundColor: '#2b4c7e', color: 'white', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-                ⏰
-              </div>
+              <div style={{ width: '40px', height: '40px', backgroundColor: '#2b4c7e', color: 'white', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>⏰</div>
               <div>
                 <strong style={{ display: 'block', color: '#333', marginBottom: '3px' }}>Çalışma Saatleri</strong>
-                <span style={{ color: '#666', fontSize: '14px', whiteSpace: 'pre-line' }}>
-                  {settings.working_hours}
-                </span>
+                <span style={{ color: '#666', fontSize: '14px', whiteSpace: 'pre-line' }}>{settings.working_hours}</span>
               </div>
             </div>
-
           </div>
         </div>
 
@@ -176,22 +164,23 @@ const Contact = () => {
             Mesaj Gönderin
           </h3>
 
-          {statusMessage.text && (
-            <div style={{
-              padding: '12px 15px',
-              borderRadius: '4px',
-              marginBottom: '20px',
-              backgroundColor: statusMessage.type === 'success' ? '#d4edda' : '#f8d7da',
-              color: statusMessage.type === 'success' ? '#155724' : '#721c24',
-              border: `1px solid ${statusMessage.type === 'success' ? '#c3e6cb' : '#f5c6cb'}`,
-              fontSize: '14px'
-            }}>
-              {statusMessage.text}
-            </div>
-          )}
+          <div ref={messageRef}>
+            {statusMessage.text && (
+              <div style={{
+                padding: '12px 15px',
+                borderRadius: '4px',
+                marginBottom: '20px',
+                backgroundColor: statusMessage.type === 'success' ? '#d4edda' : '#f8d7da',
+                color: statusMessage.type === 'success' ? '#155724' : '#721c24',
+                border: `1px solid ${statusMessage.type === 'success' ? '#c3e6cb' : '#f5c6cb'}`,
+                fontSize: '14px'
+              }}>
+                {statusMessage.text}
+              </div>
+            )}
+          </div>
 
           <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '15px' }}>
-            
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '15px' }}>
               <div>
                 <label style={{ display: 'block', fontSize: '13px', fontWeight: '600', marginBottom: '5px', color: '#333' }}>
@@ -285,13 +274,11 @@ const Contact = () => {
             >
               {loading ? 'Gönderiliyor...' : 'Mesajı Gönder'}
             </button>
-
           </form>
         </div>
-
       </div>
 
-      {/* HARİTA (DİNAMİK GOOGLE MAPS) */}
+      {/* HARİTA */}
       {settings.map_url && (
         <div style={{ borderRadius: '8px', overflow: 'hidden', border: '1px solid #eee' }}>
           <iframe
