@@ -8,7 +8,6 @@ import {
   DatePicker,
   Typography,
   Alert,
-  Space,
   Row,
   Col,
   Spin,
@@ -26,7 +25,7 @@ import {
 import axios from 'axios';
 import dayjs from 'dayjs';
 
-const { Title, Text, Paragraph } = Typography;
+const { Title, Text } = Typography;
 const { TextArea } = Input;
 
 const MaintenanceSettings = () => {
@@ -52,15 +51,18 @@ const MaintenanceSettings = () => {
     try {
       const res = await axios.get(`${API_URL}/api/maintenance/admin/settings`, getAuthHeaders());
       const data = res.data;
-      setIsActive(Boolean(data.is_active));
+      const activeStatus = Boolean(data.is_active);
+      setIsActive(activeStatus);
+
       form.setFieldsValue({
-        is_active: Boolean(data.is_active),
+        is_active: activeStatus,
         title: data.title || 'Sitemiz Bakımdadır',
         message: data.message || '',
         estimated_end_datetime: data.estimated_end_datetime ? dayjs(data.estimated_end_datetime) : null
       });
     } catch (error) {
-      message.error('Bakım modu ayarları çekilemedi.');
+      const errDetail = error.response?.data?.message || 'Bakım modu ayarları çekilemedi.';
+      message.error(errDetail);
     } finally {
       setLoading(false);
     }
@@ -75,7 +77,7 @@ const MaintenanceSettings = () => {
     setSaveLoading(true);
     try {
       const payload = {
-        is_active: values.is_active,
+        is_active: values.is_active ? 1 : 0,
         title: values.title,
         message: values.message,
         estimated_end_datetime: values.estimated_end_datetime
@@ -83,11 +85,14 @@ const MaintenanceSettings = () => {
           : null
       };
 
-      await axios.put(`${API_URL}/api/maintenance/admin/settings`, payload, getAuthHeaders());
-      setIsActive(values.is_active);
-      message.success('Bakım modu ayarları başarıyla güncellendi.');
+      const res = await axios.put(`${API_URL}/api/maintenance/admin/settings`, payload, getAuthHeaders());
+      
+      setIsActive(Boolean(values.is_active));
+      message.success(res.data.message || 'Bakım modu ayarları başarıyla güncellendi.');
     } catch (error) {
-      message.error('Ayarlar kaydedilirken bir hata oluştu.');
+      console.error('Kaydetme hatası:', error);
+      const errDetail = error.response?.data?.message || error.response?.data?.error || 'Ayarlar kaydedilirken bir hata oluştu.';
+      message.error(`Hata: ${errDetail}`);
     } finally {
       setSaveLoading(false);
     }
