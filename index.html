@@ -8,7 +8,13 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
   </head>
   <body>
-    <div id="root"></div>
+    <div id="root">
+      <!-- React yüklenene kadar görüntülenecek olan Yükleme Ekranı -->
+      <div class="initial-loader-container">
+        <div class="initial-spinner"></div>
+        <p class="initial-loader-text">Yükleniyor, lütfen bekleyiniz...</p>
+      </div>
+    </div>
     <script type="module" src="/src/main.jsx"></script>
   </body>
 </html>
