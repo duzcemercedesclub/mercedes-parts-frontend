@@ -1,10 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
-import { Link } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 import axios from 'axios';
 
 const MaintenanceGuard = ({ children }) => {
   const { user } = useAuth();
+  const location = useLocation();
   const [maintenance, setMaintenance] = useState({
     is_active: false,
     title: '',
@@ -15,30 +16,41 @@ const MaintenanceGuard = ({ children }) => {
 
   const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
 
-  useEffect(() => {
-    const checkStatus = async () => {
-      try {
-        const res = await axios.get(`${API_URL}/api/maintenance/status`);
-        setMaintenance(res.data);
-      } catch (error) {
-        console.error('Bakım modu kontrolü yapılamadı.');
-      } finally {
-        setChecking(false);
-      }
-    };
+  const checkStatus = async () => {
+    try {
+      // Önbelleği (Cache) engellemek için t parametresi eklendi
+      const res = await axios.get(`${API_URL}/api/maintenance/status?t=${new Date().getTime()}`);
+      
+      // Veritabanından gelen veri tipini (1, '1', true) kesin olarak boolean yapıyoruz
+      const activeStatus = res.data.is_active === true || res.data.is_active === 1 || res.data.is_active === '1';
+      
+      setMaintenance({
+        ...res.data,
+        is_active: activeStatus
+      });
+    } catch (error) {
+      console.error('Bakım modu kontrolü yapılamadı:', error);
+    } finally {
+      setChecking(false);
+    }
+  };
 
+  useEffect(() => {
     checkStatus();
-    // Her 30 saniyede bir bakım durumunu otomatik kontrol et
-    const interval = setInterval(checkStatus, 30000);
+    // Her 15 saniyede bir durumu otomatik kontrol et
+    const interval = setInterval(checkStatus, 15000);
     return () => clearInterval(interval);
   }, [API_URL]);
 
   if (checking) {
-    return null; // Durum kontrol edilirken kısa bekletme
+    return null;
   }
 
-  // EĞER BAKIM MODU AÇIKSA VE GİRİŞ YAPAN KULLANICI ADMİN DEĞİLSE BAKIM EKRANINI GÖSTER
-  if (maintenance.is_active && user?.role !== 'admin') {
+  // /login veya /admin ile başlayan sayfalarda bakım ekranı gösterilmez (Giriş yapılabilsin diye)
+  const isExemptPath = location.pathname === '/login' || location.pathname.startsWith('/admin');
+
+  // BAKIM MODU AÇIKSA + KULLANICI ADMİN DEĞİLSE + HARİÇ TUTULAN SAYFADA DEĞİLSE
+  if (maintenance.is_active && user?.role !== 'admin' && !isExemptPath) {
     return (
       <div className="mercedes-maintenance-overlay">
         <style>{`
@@ -145,7 +157,6 @@ const MaintenanceGuard = ({ children }) => {
           </div>
         )}
 
-        {/* Yönetici Giriş Linki (Adminlerin giriş yapabilmesi için) */}
         <Link to="/login" className="admin-login-link">
           Yönetici Girişi Yap
         </Link>
@@ -153,7 +164,6 @@ const MaintenanceGuard = ({ children }) => {
     );
   }
 
-  // Bakım modu kapalı veya oturum açan kişi admin ise siteyi normal şekilde göster
   return children;
 };
 
