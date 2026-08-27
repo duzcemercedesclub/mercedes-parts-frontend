@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useAuth } from '../context/AuthContext';
+import { useAuth } from '../../context/AuthContext';
 import { Link, useLocation } from 'react-router-dom';
 import axios from 'axios';
 
@@ -14,22 +14,25 @@ const MaintenanceGuard = ({ children }) => {
   });
   const [checking, setChecking] = useState(true);
 
-  const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+  // API URL sonundaki fazla / işaretini temizler
+  const rawApiUrl = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+  const API_URL = rawApiUrl.replace(/\/$/, '');
 
   const checkStatus = async () => {
     try {
-      // Önbelleği (Cache) engellemek için t parametresi eklendi
       const res = await axios.get(`${API_URL}/api/maintenance/status?t=${new Date().getTime()}`);
       
-      // Veritabanından gelen veri tipini (1, '1', true) kesin olarak boolean yapıyoruz
-      const activeStatus = res.data.is_active === true || res.data.is_active === 1 || res.data.is_active === '1';
+      const rawActive = res.data?.is_active;
+      const activeStatus = rawActive === true || rawActive === 1 || rawActive === '1';
       
       setMaintenance({
-        ...res.data,
-        is_active: activeStatus
+        is_active: activeStatus,
+        title: res.data?.title || 'Sitemiz Bakımdadır',
+        message: res.data?.message || 'Sizlere daha iyi hizmet verebilmek için çalışıyoruz.',
+        estimated_end_datetime: res.data?.estimated_end_datetime || null
       });
     } catch (error) {
-      console.error('Bakım modu kontrolü yapılamadı:', error);
+      console.error('Bakım modu API isteği başarısız:', error);
     } finally {
       setChecking(false);
     }
@@ -37,8 +40,7 @@ const MaintenanceGuard = ({ children }) => {
 
   useEffect(() => {
     checkStatus();
-    // Her 15 saniyede bir durumu otomatik kontrol et
-    const interval = setInterval(checkStatus, 15000);
+    const interval = setInterval(checkStatus, 10000);
     return () => clearInterval(interval);
   }, [API_URL]);
 
@@ -46,10 +48,10 @@ const MaintenanceGuard = ({ children }) => {
     return null;
   }
 
-  // /login veya /admin ile başlayan sayfalarda bakım ekranı gösterilmez (Giriş yapılabilsin diye)
+  // Yönetici giriş sayfası ve admin paneli bakımdan muaf tutulur
   const isExemptPath = location.pathname === '/login' || location.pathname.startsWith('/admin');
 
-  // BAKIM MODU AÇIKSA + KULLANICI ADMİN DEĞİLSE + HARİÇ TUTULAN SAYFADA DEĞİLSE
+  // BAKIM MODU AÇIKSA + KULLANICI ADMİN DEĞİLSE + HARİÇ TUTULAN SAYFADA DEĞİLSE BAKIM EKRANINI GÖSTER
   if (maintenance.is_active && user?.role !== 'admin' && !isExemptPath) {
     return (
       <div className="mercedes-maintenance-overlay">
@@ -134,7 +136,6 @@ const MaintenanceGuard = ({ children }) => {
           }
         `}</style>
 
-        {/* DÖNEN MERCEDES LOGOSU */}
         <div className="mercedes-logo-wrapper">
           <svg className="mercedes-star-svg" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
             <circle cx="50" cy="50" r="46" stroke="#E2E8F0" strokeWidth="4" />
@@ -144,11 +145,8 @@ const MaintenanceGuard = ({ children }) => {
           </svg>
         </div>
 
-        <h1 className="maintenance-title">{maintenance.title || 'SİTEMİZ BAKIMDADIR'}</h1>
-        
-        <p className="maintenance-message">
-          {maintenance.message || 'Sizlere daha iyi hizmet verebilmek için sistemlerimizi güncelliyoruz. Kısa süre sonra tekrar aktif olacağız.'}
-        </p>
+        <h1 className="maintenance-title">{maintenance.title}</h1>
+        <p className="maintenance-message">{maintenance.message}</p>
 
         {maintenance.estimated_end_datetime && (
           <div className="maintenance-time-box">
