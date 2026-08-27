@@ -64,6 +64,8 @@ import SmtpSettings from "./pages/admin/Settings/SmtpSettings";
 import SeoSettings from "./pages/admin/Settings/SeoSettings";
 import FooterSettings from "./pages/admin/Settings/FooterSettings";
 import ContactManagement from "./pages/admin/Contact/ContactManagement";
+import MaintenanceSettings from "./pages/admin/Settings/MaintenanceSettings";
+
 
 // --- GÜVENLİK KİLİDİ (PROTECTED ROUTE) ---
 const ProtectedAdminRoute = ({ children }) => {
@@ -170,6 +172,7 @@ const App = () => {
           <Route path="settings/seo" element={<SeoSettings />} />
           <Route path="settings/footer" element={<FooterSettings />} />
           <Route path="settings/contact" element={<ContactManagement />} />
+          <Route path="settings/maintenance" element={<MaintenanceSettings />} />
         </Route>
       </Routes>
     </>

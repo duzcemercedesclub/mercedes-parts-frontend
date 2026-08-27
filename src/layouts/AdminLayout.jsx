@@ -180,6 +180,7 @@ const AdminLayout = () => {
         { key: '/admin/settings/seo', label: 'Meta SEO Ayarları' },
         { key: '/admin/settings/footer', label: 'Footer Düzenleyici' },
         { key: '/admin/settings/contact', label: 'İletişim Sayfası' },
+        { key: '/admin/settings/maintenance', label: 'Bakım Modu Sayfası' },
       ],
     },
   ];
