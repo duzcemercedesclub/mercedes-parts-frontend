@@ -4,6 +4,9 @@ import { useAuth } from "./context/AuthContext";
 import ScrollToTop from './components/ScrollToTop';
 import DemoNoticeModal from './components/ui/DemoNoticeModal/DemoNoticeModal';
 
+// BAKIM MODU KORUMA BİLEŞENİ
+import MaintenanceGuard from './pages/public/MaintenanceGuard';
+
 import MainLayout from "./layouts/MainLayout";
 import AdminLayout from "./layouts/AdminLayout";
 import Home from "./pages/public/Home";
@@ -83,7 +86,7 @@ const App = () => {
   const [showDemoModal, setShowDemoModal] = useState(true);
 
   return (
-    <>
+    <MaintenanceGuard>
       {/* DENEME AŞAMASI MODAL UYARISI */}
       {showDemoModal && (
         <DemoNoticeModal onClose={() => setShowDemoModal(false)} />
@@ -175,7 +178,7 @@ const App = () => {
           <Route path="settings/maintenance" element={<MaintenanceSettings />} />
         </Route>
       </Routes>
-    </>
+    </MaintenanceGuard>
   );
 };
 
