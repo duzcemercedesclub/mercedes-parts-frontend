@@ -14,7 +14,11 @@ const MaintenanceGuard = ({ children }) => {
   });
   const [checking, setChecking] = useState(true);
 
-  // API URL sonundaki fazla / işaretini temizler
+  // Pinterest'teki veya sunucunuzdaki doğrudan GIF bağlantısı
+  // Not: Pinterest sayfa linki (tr.pinterest.com/pin/...) yerine doğrudan görsel adresini (.gif) veya local dosya yolunuzu yazabilirsiniz.
+  const MERCEDES_GIF_URL = "https://i.pinimg.com/originals/b5/07/7e/b5077e64177d6786c551239f67a2a16d.gif";
+
+  // API URL temizliği
   const rawApiUrl = import.meta.env.VITE_API_URL || 'http://localhost:5000';
   const API_URL = rawApiUrl.replace(/\/$/, '');
 
@@ -27,12 +31,12 @@ const MaintenanceGuard = ({ children }) => {
       
       setMaintenance({
         is_active: activeStatus,
-        title: res.data?.title || 'Sitemiz Bakımdadır',
-        message: res.data?.message || 'Sizlere daha iyi hizmet verebilmek için çalışıyoruz.',
+        title: res.data?.title || 'SİTEMİZ BAKIMDADIR',
+        message: res.data?.message || 'Sizlere daha iyi hizmet verebilmek için altyapımızı güncelliyoruz.',
         estimated_end_datetime: res.data?.estimated_end_datetime || null
       });
     } catch (error) {
-      console.error('Bakım modu API isteği başarısız:', error);
+      console.error('Bakım modu durumu sorgulanamadı:', error);
     } finally {
       setChecking(false);
     }
@@ -48,10 +52,10 @@ const MaintenanceGuard = ({ children }) => {
     return null;
   }
 
-  // Yönetici giriş sayfası ve admin paneli bakımdan muaf tutulur
+  // Admin paneli ve login rotalarını bakımdan muaf tut
   const isExemptPath = location.pathname === '/login' || location.pathname.startsWith('/admin');
 
-  // BAKIM MODU AÇIKSA + KULLANICI ADMİN DEĞİLSE + HARİÇ TUTULAN SAYFADA DEĞİLSE BAKIM EKRANINI GÖSTER
+  // Bakım aktif + kullanıcı admin değil + hariç tutulan yolda değilse ekranı göster
   if (maintenance.is_active && user?.role !== 'admin' && !isExemptPath) {
     return (
       <div className="mercedes-maintenance-overlay">
@@ -77,28 +81,24 @@ const MaintenanceGuard = ({ children }) => {
 
           .mercedes-logo-wrapper {
             position: relative;
-            width: 140px;
-            height: 140px;
-            margin-bottom: 32px;
+            width: 180px;
+            height: 180px;
+            margin-bottom: 24px;
             display: flex;
             justify-content: center;
             align-items: center;
           }
 
-          .mercedes-star-svg {
+          .mercedes-gif-img {
             width: 100%;
             height: 100%;
-            animation: mercedesSpin 10s linear infinite;
-            filter: drop-shadow(0 0 15px rgba(255, 255, 255, 0.3));
-          }
-
-          @keyframes mercedesSpin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
+            object-fit: contain;
+            border-radius: 50%;
+            filter: drop-shadow(0 0 20px rgba(255, 255, 255, 0.2));
           }
 
           .maintenance-title {
-            font-size: 32px;
+            font-size: 30px;
             font-weight: 700;
             letter-spacing: 2px;
             margin-bottom: 16px;
@@ -136,16 +136,17 @@ const MaintenanceGuard = ({ children }) => {
           }
         `}</style>
 
+        {/* PINTEREST GIF EKRANI */}
         <div className="mercedes-logo-wrapper">
-          <svg className="mercedes-star-svg" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <circle cx="50" cy="50" r="46" stroke="#E2E8F0" strokeWidth="4" />
-            <path d="M50 8 L50 50 L20 80 Z" fill="#E2E8F0" />
-            <path d="M50 8 L50 50 L80 80 Z" fill="#CBD5E1" />
-            <path d="M50 50 L80 80 L20 80 Z" fill="#94A3B8" />
-          </svg>
+          <img 
+            src={MERCEDES_GIF_URL} 
+            alt="Mercedes Logo Animation" 
+            className="mercedes-gif-img"
+          />
         </div>
 
         <h1 className="maintenance-title">{maintenance.title}</h1>
+        
         <p className="maintenance-message">{maintenance.message}</p>
 
         {maintenance.estimated_end_datetime && (
