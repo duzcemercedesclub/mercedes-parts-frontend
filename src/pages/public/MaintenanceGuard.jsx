@@ -14,9 +14,9 @@ const MaintenanceGuard = ({ children }) => {
   });
   const [checking, setChecking] = useState(true);
 
-  // Pinterest'teki veya sunucunuzdaki doğrudan GIF bağlantısı
-  // Not: Pinterest sayfa linki (tr.pinterest.com/pin/...) yerine doğrudan görsel adresini (.gif) veya local dosya yolunuzu yazabilirsiniz.
-  const MERCEDES_GIF_URL = "https://i.pinimg.com/originals/b5/07/7e/b5077e64177d6786c551239f67a2a16d.gif";
+  // Videonuzu public/ klasörüne 'maintenance-video.mp4' adıyla koyduğunuzda bu yol geçerlidir.
+  // Dilerseniz doğrudan harici bir .mp4 URL'i de verebilirsiniz.
+  const VIDEO_SRC = "/maintenance-video.mp4";
 
   // API URL temizliği
   const rawApiUrl = import.meta.env.VITE_API_URL || 'http://localhost:5000';
@@ -66,7 +66,7 @@ const MaintenanceGuard = ({ children }) => {
             left: 0;
             width: 100vw;
             height: 100vh;
-            background: linear-gradient(135deg, #0a0c10 0%, #151922 100%);
+            background-color: #000000;
             color: #ffffff;
             display: flex;
             flex-direction: column;
@@ -77,28 +77,40 @@ const MaintenanceGuard = ({ children }) => {
             padding: 24px;
             font-family: 'Jost', sans-serif;
             box-sizing: border-box;
+            overflow: hidden;
           }
 
-          .mercedes-logo-wrapper {
-            position: relative;
-            width: 180px;
-            height: 180px;
-            margin-bottom: 24px;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-          }
-
-          .mercedes-gif-img {
+          /* Arka plan karartma katmanı */
+          .video-backdrop {
+            position: absolute;
+            top: 0;
+            left: 0;
             width: 100%;
             height: 100%;
-            object-fit: contain;
-            border-radius: 50%;
-            filter: drop-shadow(0 0 20px rgba(255, 255, 255, 0.2));
+            object-fit: cover;
+            opacity: 0.45;
+            z-index: 1;
+          }
+
+          /* Ön plandaki içerik kartı */
+          .maintenance-content {
+            position: relative;
+            z-index: 2;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            max-width: 650px;
+            background: rgba(10, 12, 16, 0.65);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            padding: 40px;
+            border-radius: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.8);
           }
 
           .maintenance-title {
-            font-size: 30px;
+            font-size: 28px;
             font-weight: 700;
             letter-spacing: 2px;
             margin-bottom: 16px;
@@ -107,26 +119,25 @@ const MaintenanceGuard = ({ children }) => {
           }
 
           .maintenance-message {
-            max-width: 600px;
-            font-size: 16px;
+            font-size: 15px;
             line-height: 1.6;
-            color: #a0aec0;
-            margin-bottom: 28px;
+            color: #cbd5e1;
+            margin-bottom: 24px;
           }
 
           .maintenance-time-box {
-            background: rgba(255, 255, 255, 0.05);
-            border: 1px solid rgba(255, 255, 255, 0.15);
-            padding: 12px 24px;
+            background: rgba(56, 189, 248, 0.1);
+            border: 1px solid rgba(56, 189, 248, 0.3);
+            padding: 10px 20px;
             border-radius: 30px;
-            font-size: 14px;
+            font-size: 13px;
             color: #38bdf8;
-            margin-bottom: 32px;
+            margin-bottom: 24px;
           }
 
           .admin-login-link {
             font-size: 13px;
-            color: #64748b;
+            color: #94a3b8;
             text-decoration: underline;
             transition: color 0.3s;
           }
@@ -136,29 +147,32 @@ const MaintenanceGuard = ({ children }) => {
           }
         `}</style>
 
-        {/* PINTEREST GIF EKRANI */}
-        <div className="mercedes-logo-wrapper">
-          <img 
-            src={MERCEDES_GIF_URL} 
-            alt="Mercedes Logo Animation" 
-            className="mercedes-gif-img"
-          />
+        {/* TAM EKRAN ARKA PLAN VİDEOSU */}
+        <video 
+          className="video-backdrop" 
+          src={VIDEO_SRC} 
+          autoPlay 
+          loop 
+          muted 
+          playsInline
+        />
+
+        {/* MERKEZİ BİLGİ KARTI */}
+        <div className="maintenance-content">
+          <h1 className="maintenance-title">{maintenance.title}</h1>
+          <p className="maintenance-message">{maintenance.message}</p>
+
+          {maintenance.estimated_end_datetime && (
+            <div className="maintenance-time-box">
+              ⏱ <strong>Tahmini Bitiş Zamanı:</strong>{' '}
+              {new Date(maintenance.estimated_end_datetime).toLocaleString('tr-TR')}
+            </div>
+          )}
+
+          <Link to="/login" className="admin-login-link">
+            Yönetici Girişi Yap
+          </Link>
         </div>
-
-        <h1 className="maintenance-title">{maintenance.title}</h1>
-        
-        <p className="maintenance-message">{maintenance.message}</p>
-
-        {maintenance.estimated_end_datetime && (
-          <div className="maintenance-time-box">
-            ⏱ <strong>Tahmini Bitiş Zamanı:</strong>{' '}
-            {new Date(maintenance.estimated_end_datetime).toLocaleString('tr-TR')}
-          </div>
-        )}
-
-        <Link to="/login" className="admin-login-link">
-          Yönetici Girişi Yap
-        </Link>
       </div>
     );
   }
