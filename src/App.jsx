@@ -68,6 +68,7 @@ import SeoSettings from "./pages/admin/Settings/SeoSettings";
 import FooterSettings from "./pages/admin/Settings/FooterSettings";
 import ContactManagement from "./pages/admin/Contact/ContactManagement";
 import MaintenanceSettings from "./pages/admin/Settings/MaintenanceSettings";
+import ForgotPassword from './pages/public/ForgotPassword';
 
 
 // --- GÜVENLİK KİLİDİ (PROTECTED ROUTE) ---
@@ -105,6 +106,7 @@ const App = () => {
           <Route path="register" element={<Register />} />
           <Route path="contact" element={<Contact />} />
           <Route path="/checkout-success" element={<CheckoutSuccess />} />
+          <Route path="/forgot-password" element={<ForgotPassword />} />
 
           {/* HESABIM SAYFA YÖNLENDİRMELERİ */}
           <Route path="hesabim/siparislerim" element={<MyOrders />} />

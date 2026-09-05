@@ -6,6 +6,7 @@ import './Auth.css';
 const Login = () => {
   const [identifier, setIdentifier] = useState('');
   const [password, setPassword] = useState('');
+  const [rememberMe, setRememberMe] = useState(true); // Varsayılan olarak işaretli
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
@@ -18,7 +19,7 @@ const Login = () => {
     setError('');
     setLoading(true);
 
-    const result = await login(identifier, password);
+    const result = await login(identifier, password, rememberMe);
     setLoading(false);
 
     if (result.success) {
@@ -45,7 +46,7 @@ const Login = () => {
             />
           </div>
 
-          {/* Şifre ve Eye Toggle */}
+          {/* Şifre ve Göz Toggle */}
           <div className="floating-input-group full-width password-group has-value-label">
             <span className="mini-label">Şifre</span>
             <input 
@@ -63,8 +64,25 @@ const Login = () => {
             </button>
           </div>
 
-          {/* Şifremi Unuttum Bağlantısı */}
-          <div className="forgot-password-wrapper">
+          {/* Beni Hatırla ve Şifremi Unuttum Satırı */}
+          <div style={{
+            display: 'flex',
+            justifyContent: 'space-between',
+            alignItems: 'center',
+            marginBottom: '20px',
+            fontSize: '13px',
+            color: '#cbd5e1'
+          }}>
+            <label style={{ display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer', userSelect: 'none' }}>
+              <input 
+                type="checkbox" 
+                checked={rememberMe} 
+                onChange={(e) => setRememberMe(e.target.checked)} 
+                style={{ width: '16px', height: '16px', accentColor: '#38bdf8', cursor: 'pointer' }}
+              />
+              Beni Hatırla
+            </label>
+
             <Link to="/forgot-password" className="forgot-password-link">
               Şifremi Unuttum
             </Link>
