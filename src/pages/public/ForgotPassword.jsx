@@ -18,28 +18,34 @@ const ForgotPassword = () => {
   const navigate = useNavigate();
   const apiUrl = import.meta.env.VITE_API_URL || import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000';
 
-  // ADIM 1: Kod Gönder
-  const handleSendCode = async (e) => {
-    e.preventDefault();
-    setError('');
-    setSuccessMsg('');
+ // Adım 1: Kod Gönder butonunun fonksiyonunu bu şekilde güncelleyin:
+const handleSendCode = async (e) => {
+  e.preventDefault();
+  setError('');
+  setSuccessMsg('');
 
-    if (!email) {
-      setError('Lütfen e-posta adresinizi giriniz.');
-      return;
-    }
+  if (!email) {
+    setError('Lütfen e-posta adresinizi giriniz.');
+    return;
+  }
 
-    setLoading(true);
-    try {
-      const res = await axios.post(`${apiUrl}/api/auth/forgot-password`, { email });
-      setSuccessMsg(res.data.message || 'Doğrulama kodu e-postanıza gönderildi.');
-      setStep(2); // 2. Adıma Geç (Kod ve Yeni Şifre Formu)
-    } catch (err) {
+  setLoading(true);
+  try {
+    const res = await axios.post(`${apiUrl}/api/auth/forgot-password`, { email }, {
+      timeout: 10000 // 10 saniye içinde yanıt gelmezse hataya düşür
+    });
+    setSuccessMsg(res.data.message || 'Doğrulama kodu e-postanıza gönderildi.');
+    setStep(2); // Otomatik olarak 2. adıma geç
+  } catch (err) {
+    if (err.code === 'ECONNABORTED') {
+      setError('Bağlantı zaman aşımına uğradı. Lütfen tekrar deneyin.');
+    } else {
       setError(err.response?.data?.message || 'Kod gönderilirken bir hata oluştu.');
-    } finally {
-      setLoading(false);
     }
-  };
+  } finally {
+    setLoading(false); // Buton kilidini kaldır
+  }
+};
 
   // ADIM 2: Kodu Doğrula ve Şifreyi Veritabanında Değiştir (Enter ile çalışır)
   const handleResetPassword = async (e) => {
