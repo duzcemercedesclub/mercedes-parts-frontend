@@ -15,7 +15,6 @@ const MaintenanceGuard = ({ children }) => {
   const [checking, setChecking] = useState(true);
 
   // Videonuzu public/ klasörüne 'maintenance-video.mp4' adıyla koyduğunuzda bu yol geçerlidir.
-  // Dilerseniz doğrudan harici bir .mp4 URL'i de verebilirsiniz.
   const VIDEO_SRC = "/maintenance-video.mp4";
 
   // API URL temizliği
@@ -24,7 +23,10 @@ const MaintenanceGuard = ({ children }) => {
 
   const checkStatus = async () => {
     try {
-      const res = await axios.get(`${API_URL}/api/maintenance/status?t=${new Date().getTime()}`);
+      // Backend uykudaysa veya yanıt vermiyorsa 8 saniye sonra zaman aşımına uğratır
+      const res = await axios.get(`${API_URL}/api/maintenance/status?t=${new Date().getTime()}`, {
+        timeout: 8000
+      });
       
       const rawActive = res.data?.is_active;
       const activeStatus = rawActive === true || rawActive === 1 || rawActive === '1';
@@ -36,7 +38,9 @@ const MaintenanceGuard = ({ children }) => {
         estimated_end_datetime: res.data?.estimated_end_datetime || null
       });
     } catch (error) {
-      console.error('Bakım modu durumu sorgulanamadı:', error);
+      console.warn('Bakım modu durumu sorgulanamadı (Backend uykuda veya erişilemiyor):', error);
+      // Hata durumunda siteyi kapatma, bakım modunu pasif varsayıp devam et
+      setMaintenance(prev => ({ ...prev, is_active: false }));
     } finally {
       setChecking(false);
     }
@@ -48,14 +52,50 @@ const MaintenanceGuard = ({ children }) => {
     return () => clearInterval(interval);
   }, [API_URL]);
 
-  if (checking) {
-    return null;
-  }
-
   // Admin paneli ve login rotalarını bakımdan muaf tut
   const isExemptPath = location.pathname === '/login' || location.pathname.startsWith('/admin');
 
-  // Bakım aktif + kullanıcı admin değil + hariç tutulan yolda değilse ekranı göster
+  // 1. DÜZELTME: Beyaz ekran yerine tema ile uyumlu Yükleniyor ekranı gösterilir
+  if (checking) {
+    return (
+      <div style={{
+        position: 'fixed',
+        top: 0,
+        left: 0,
+        width: '100vw',
+        height: '100vh',
+        backgroundColor: '#0a0c10',
+        display: 'flex',
+        flexDirection: 'column',
+        justifyContent: 'center',
+        alignItems: 'center',
+        zIndex: 999999,
+        color: '#ffffff',
+        fontFamily: "'Jost', sans-serif"
+      }}>
+        <style>{`
+          .maintenance-spinner {
+            width: 44px;
+            height: 44px;
+            border: 3px solid rgba(255, 255, 255, 0.1);
+            border-top: 3px solid #38bdf8;
+            border-radius: 50%;
+            animation: maintenance-spin 0.8s linear infinite;
+          }
+          @keyframes maintenance-spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+          }
+        `}</style>
+        <div className="maintenance-spinner"></div>
+        <p style={{ marginTop: '18px', fontSize: '14px', color: '#cbd5e1', letterSpacing: '0.5px' }}>
+          Sistem kontrol ediliyor, lütfen bekleyiniz...
+        </p>
+      </div>
+    );
+  }
+
+  // 2. Bakım aktif + kullanıcı admin değil + hariç tutulan yolda değilse bakım ekranını göster
   if (maintenance.is_active && user?.role !== 'admin' && !isExemptPath) {
     return (
       <div className="mercedes-maintenance-overlay">
